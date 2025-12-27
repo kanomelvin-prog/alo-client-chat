@@ -130,45 +130,6 @@
       background: var(--cream);
     }
 
-    .chat-header {
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--warm-white);
-    }
-
-    .chat-header h1 {
-      font-family: 'Newsreader', serif;
-      font-size: 1.25rem;
-      font-weight: 400;
-      color: var(--charcoal);
-      margin-bottom: 0.25rem;
-    }
-
-    .chat-header p {
-      font-size: 0.875rem;
-      color: var(--stone);
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1.5rem 2rem;
-    }
-
-    /* Botpress Chat Embed */
-    .chat-embed {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #bp-web-widget {
-      flex: 1;
-      border: none;
-      width: 100%;
-      height: 100%;
-    }
-
     /* Sidebar */
     .sidebar {
       background: var(--warm-white);
@@ -308,22 +269,6 @@
       opacity: 1;
     }
 
-    /* Mobile toggle */
-    .mobile-sidebar-toggle {
-      display: none;
-      padding: 0.5rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      color: var(--stone);
-    }
-
-    @media (max-width: 900px) {
-      .mobile-sidebar-toggle {
-        display: block;
-      }
-    }
-
     /* Loading states */
     .loading {
       display: flex;
@@ -430,6 +375,53 @@
       flex-direction: column;
       flex: 1;
     }
+
+    /* Connected state */
+    .connected-header {
+      padding: 1rem 1.5rem;
+      background: var(--sage-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .connected-info {
+      font-size: 0.875rem;
+      color: var(--sage-hover);
+    }
+
+    .disconnect-btn {
+      padding: 0.4rem 0.75rem;
+      background: transparent;
+      border: 1px solid var(--sage);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--sage-hover);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .disconnect-btn:hover {
+      background: var(--sage);
+      color: white;
+    }
+
+    /* Mobile toggle */
+    .mobile-sidebar-toggle {
+      display: none;
+      padding: 0.5rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--stone);
+    }
+
+    @media (max-width: 900px) {
+      .mobile-sidebar-toggle {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
@@ -465,14 +457,15 @@
           </div>
         </div>
 
-        <!-- Alo Chat (Botpress) -->
-        <div class="chat-embed" id="chatView" style="display: none;">
-          <div class="chat-header">
-            <h1>Talk with Alo</h1>
-            <p>I'm here to help you think things through.</p>
+        <!-- Connected State -->
+        <div id="connectedView" style="display: none; flex: 1; display: none; flex-direction: column;">
+          <div class="connected-header">
+            <span class="connected-info">Connected as: <strong id="connectedCode"></strong></span>
+            <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
           </div>
+          <!-- Botpress Chat Embed -->
           <iframe 
-            id="aloChat" 
+            id="botpressChat" 
             src="" 
             style="flex: 1; border: none; width: 100%; min-height: 500px;"
             allow="microphone"
@@ -495,8 +488,9 @@
           These are things your therapist thought might be helpful to explore. No pressure—just invitations.
         </p>
         <div class="homework-list" id="homeworkList">
-          <div class="loading">
-            <div class="loading-spinner"></div>
+          <div class="homework-empty">
+            <div class="homework-empty-icon">📝</div>
+            <p>Connect with your client code to see homework.</p>
           </div>
         </div>
       </div>
@@ -585,20 +579,19 @@
   
   <script>
     // ============================================================
-    // CONFIGURATION - Replace with your values
+    // CONFIGURATION
     // ============================================================
-    // Get these from Supabase: Settings → API
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
+    const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
     
-    // Get this from Botpress: Share → Copy URL (the shareable.html link)
-    const BOTPRESS_WEBCHAT_URL = 'YOUR_BOTPRESS_SHAREABLE_URL_HERE';
+    // Botpress shareable URL - UPDATE THIS with your actual Botpress URL
+    const BOTPRESS_URL = 'https://cdn.botpress.cloud/webchat/v2.2/shareable.html?botId=9a94667e-05a8-4603-a52f-f54615e23635';
 
     // ============================================================
     // STATE
     // ============================================================
     let clientCode = localStorage.getItem('aloClientCode') || null;
-    let supabase = null;
+    let db = null;
     let saveTimeout = null;
 
     // ============================================================
@@ -606,7 +599,7 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
       // Initialize Supabase
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       // Check for stored client code
       if (clientCode) {
@@ -661,14 +654,14 @@
       clientCode = code;
       localStorage.setItem('aloClientCode', code);
 
-      // Show chat view
+      // Hide welcome, show connected view
       document.getElementById('welcomeView').style.display = 'none';
-      document.getElementById('chatView').style.display = 'flex';
+      document.getElementById('connectedView').style.display = 'flex';
+      document.getElementById('connectedCode').textContent = code;
 
       // Load Botpress chat with client context
-      const chatFrame = document.getElementById('aloChat');
-      // Pass client_code as URL param so Botpress can pick it up
-      chatFrame.src = BOTPRESS_WEBCHAT_URL + '&userId=' + encodeURIComponent(code);
+      const chatFrame = document.getElementById('botpressChat');
+      chatFrame.src = BOTPRESS_URL + '&userId=' + encodeURIComponent(code);
 
       // Load homework
       loadHomework();
@@ -677,12 +670,26 @@
       loadNotes();
     }
 
+    function disconnect() {
+      clientCode = null;
+      localStorage.removeItem('aloClientCode');
+      
+      // Reset UI
+      document.getElementById('welcomeView').style.display = 'flex';
+      document.getElementById('connectedView').style.display = 'none';
+      document.getElementById('clientCodeInput').value = '';
+      document.getElementById('botpressChat').src = '';
+      
+      // Clear homework display
+      renderHomework([]);
+    }
+
     // ============================================================
     // HOMEWORK
     // ============================================================
     async function loadHomework() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from('homework')
           .select('*')
           .eq('client_code', clientCode)
@@ -727,22 +734,8 @@
           document.getElementById('checkInNotes').value = localNotes;
           document.getElementById('sidebarNotes').value = localNotes;
         }
-
-        // Also try to load from database (in case they switch devices)
-        const { data, error } = await supabase
-          .from('client_notes')
-          .select('notes')
-          .eq('client_code', clientCode)
-          .single();
-
-        if (data && data.notes) {
-          document.getElementById('checkInNotes').value = data.notes;
-          document.getElementById('sidebarNotes').value = data.notes;
-          localStorage.setItem(`aloNotes_${clientCode}`, data.notes);
-        }
       } catch (err) {
-        // Table might not exist yet - that's okay
-        console.log('Notes table not found, using localStorage only');
+        console.log('Error loading notes:', err);
       }
     }
 
@@ -754,7 +747,6 @@
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
         showSavedIndicator('notesSaved');
-        saveNotesToDb(notes);
       }, 1000);
     }
 
@@ -765,26 +757,7 @@
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
         showSavedIndicator('sidebarNotesSaved');
-        saveNotesToDb(notes);
       }, 1000);
-    }
-
-    async function saveNotesToDb(notes) {
-      try {
-        // Upsert to database (if table exists)
-        await supabase
-          .from('client_notes')
-          .upsert({ 
-            client_code: clientCode, 
-            notes: notes,
-            updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'client_code' 
-          });
-      } catch (err) {
-        // Silent fail - localStorage is our backup
-        console.log('Could not save to database, using localStorage');
-      }
     }
 
     function showSavedIndicator(elementId) {
