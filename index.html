@@ -20,8 +20,6 @@
       --sage: #8B9A7D;
       --sage-light: #E8EDE4;
       --sage-hover: #7A8A6C;
-      --blush: #E8D4CE;
-      --sand: #D4CFC6;
       --border: rgba(156, 149, 137, 0.2);
     }
 
@@ -109,17 +107,6 @@
       .sidebar {
         display: none;
       }
-      .sidebar.mobile-open {
-        display: block;
-        position: fixed;
-        top: 60px;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        max-width: 320px;
-        z-index: 50;
-        box-shadow: -4px 0 24px rgba(0,0,0,0.1);
-      }
     }
 
     /* Chat Area */
@@ -180,12 +167,6 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 1rem;
-      transition: all 0.2s ease;
-    }
-
-    .homework-card:hover {
-      border-color: var(--sage);
-      box-shadow: 0 2px 8px rgba(139, 154, 125, 0.1);
     }
 
     .homework-type {
@@ -210,13 +191,7 @@
       font-size: 0.875rem;
     }
 
-    .homework-empty-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      opacity: 0.4;
-    }
-
-    /* Check-in Notes */
+    /* Notes */
     .notes-container {
       flex: 1;
       display: flex;
@@ -234,24 +209,17 @@
       font-size: 0.875rem;
       color: var(--charcoal);
       background: var(--cream);
-      transition: all 0.2s ease;
     }
 
     .notes-textarea:focus {
       outline: none;
       border-color: var(--sage);
-      box-shadow: 0 0 0 3px rgba(139, 154, 125, 0.1);
-    }
-
-    .notes-textarea::placeholder {
-      color: var(--stone);
     }
 
     .notes-hint {
       font-size: 0.75rem;
       color: var(--stone);
       margin-top: 0.75rem;
-      line-height: 1.5;
     }
 
     .notes-saved {
@@ -269,29 +237,7 @@
       opacity: 1;
     }
 
-    /* Loading states */
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      color: var(--stone);
-    }
-
-    .loading-spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid var(--border);
-      border-top-color: var(--sage);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Welcome state when no client code */
+    /* Welcome state */
     .welcome-container {
       display: flex;
       flex-direction: column;
@@ -349,36 +295,15 @@
       font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s ease;
     }
 
     .client-code-input button:hover {
       background: var(--sage-hover);
     }
 
-    /* Full chat view (no sidebar) */
-    .main.chat-only {
-      grid-template-columns: 1fr;
-    }
-
-    .main.chat-only .sidebar {
-      display: none;
-    }
-
-    /* Panel views */
-    .panel {
-      display: none;
-    }
-
-    .panel.active {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    /* Connected state */
+    /* Connected state header */
     .connected-header {
-      padding: 1rem 1.5rem;
+      padding: 0.75rem 1.5rem;
       background: var(--sage-light);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -399,7 +324,6 @@
       font-size: 0.75rem;
       color: var(--sage-hover);
       cursor: pointer;
-      transition: all 0.2s;
     }
 
     .disconnect-btn:hover {
@@ -407,20 +331,59 @@
       color: white;
     }
 
-    /* Mobile toggle */
-    .mobile-sidebar-toggle {
+    /* Panel views */
+    .panel {
       display: none;
-      padding: 0.5rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
+    }
+
+    .panel.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .main.chat-only {
+      grid-template-columns: 1fr;
+    }
+
+    .main.chat-only .sidebar {
+      display: none;
+    }
+
+    /* Chat panel content */
+    .chat-panel-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Botpress will inject here */
+    #bp-webchat-container {
+      flex: 1;
+      min-height: 400px;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
       color: var(--stone);
     }
 
-    @media (max-width: 900px) {
-      .mobile-sidebar-toggle {
-        display: block;
-      }
+    .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--sage);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -433,13 +396,6 @@
       <button class="nav-tab" data-tab="homework">Homework</button>
       <button class="nav-tab" data-tab="notes">Session Notes</button>
     </nav>
-    <button class="mobile-sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
   </header>
 
   <!-- Main Content -->
@@ -452,45 +408,34 @@
           <h2>Welcome to Alo</h2>
           <p>Your thinking partner between sessions. Enter your client code to get started.</p>
           <div class="client-code-input">
-            <input type="text" id="clientCodeInput" placeholder="Your code (e.g., CLI001)" autocomplete="off">
+            <input type="text" id="clientCodeInput" placeholder="Your code (e.g., ClientName-001)" autocomplete="off">
             <button id="connectBtn">Connect</button>
           </div>
         </div>
 
-        <!-- Connected State -->
-        <div id="connectedView" style="display: none; flex: 1; display: none; flex-direction: column;">
+        <!-- Connected State with Chat -->
+        <div id="connectedView" style="display: none; flex: 1; flex-direction: column;">
           <div class="connected-header">
             <span class="connected-info">Connected as: <strong id="connectedCode"></strong></span>
             <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
           </div>
-          <!-- Botpress Chat Embed -->
-          <iframe 
-            id="botpressChat" 
-            src="" 
-            style="flex: 1; border: none; width: 100%; min-height: 500px;"
-            allow="microphone"
-          ></iframe>
+          <div class="chat-panel-content">
+            <div id="bp-webchat-container"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Homework Panel -->
     <div class="panel" id="homeworkPanel">
-      <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
-        <h2 class="section-title">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-          </svg>
-          Your Homework
-        </h2>
+      <div class="sidebar-section" style="flex: 1; overflow-y: auto; padding: 2rem;">
+        <h2 class="section-title">Your Homework</h2>
         <p style="color: var(--stone); font-size: 0.875rem; margin-bottom: 1.5rem;">
-          These are things your therapist thought might be helpful to explore. No pressure—just invitations.
+          These are things your therapist thought might be helpful to explore.
         </p>
         <div class="homework-list" id="homeworkList">
           <div class="homework-empty">
-            <div class="homework-empty-icon">📝</div>
-            <p>Connect with your client code to see homework.</p>
+            <p>No homework right now.<br>Check back after your next session.</p>
           </div>
         </div>
       </div>
@@ -498,18 +443,10 @@
 
     <!-- Notes Panel -->
     <div class="panel" id="notesPanel">
-      <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
-        <h2 class="section-title">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-          Notes for Your Next Session
-        </h2>
+      <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; padding: 2rem;">
+        <h2 class="section-title">Notes for Your Next Session</h2>
         <p style="color: var(--stone); font-size: 0.875rem; margin-bottom: 1.5rem;">
-          Jot down anything you want to bring up with your therapist. Only you decide what to share.
+          Jot down anything you want to bring up with your therapist.
         </p>
         <div class="notes-container">
           <textarea 
@@ -517,9 +454,7 @@
             id="checkInNotes" 
             placeholder="What's been on your mind? What would you like to talk about next session?"
           ></textarea>
-          <p class="notes-hint">
-            ✨ These notes are just for you. Share them with your therapist however you'd like.
-          </p>
+          <p class="notes-hint">✨ These notes are just for you. Only you decide what to share.</p>
           <div class="notes-saved" id="notesSaved">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
@@ -530,32 +465,16 @@
       </div>
     </div>
 
-    <!-- Sidebar (for desktop - shows homework + notes alongside chat) -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-section">
-        <h3 class="section-title">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 20h9"></path>
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-          </svg>
-          Your Homework
-        </h3>
+        <h3 class="section-title">Your Homework</h3>
         <div class="homework-list" id="sidebarHomework">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-          </div>
+          <div class="loading"><div class="loading-spinner"></div></div>
         </div>
       </div>
       <div class="sidebar-section">
-        <h3 class="section-title">
-          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-          Session Notes
-        </h3>
+        <h3 class="section-title">Session Notes</h3>
         <div class="notes-container">
           <textarea 
             class="notes-textarea" 
@@ -574,8 +493,11 @@
     </aside>
   </main>
 
-  <!-- Supabase Client -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Botpress Webchat -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
   
   <script>
     // ============================================================
@@ -584,8 +506,8 @@
     const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
     
-    // Botpress shareable URL
-    const BOTPRESS_URL = 'https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json';
+    // Botpress config
+    const BOTPRESS_CONFIG_URL = 'https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json';
 
     // ============================================================
     // STATE
@@ -593,6 +515,7 @@
     let clientCode = localStorage.getItem('aloClientCode') || null;
     let db = null;
     let saveTimeout = null;
+    let botpressLoaded = false;
 
     // ============================================================
     // INITIALIZATION
@@ -622,7 +545,7 @@
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
       });
 
-      // Notes auto-save (both panels and sidebar)
+      // Notes auto-save
       document.getElementById('checkInNotes').addEventListener('input', handleNotesChange);
       document.getElementById('sidebarNotes').addEventListener('input', handleSidebarNotesChange);
 
@@ -633,18 +556,13 @@
       document.getElementById('sidebarNotes').addEventListener('input', () => {
         document.getElementById('checkInNotes').value = document.getElementById('sidebarNotes').value;
       });
-
-      // Mobile sidebar toggle
-      document.getElementById('sidebarToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('mobile-open');
-      });
     }
 
     // ============================================================
     // CLIENT CONNECTION
     // ============================================================
     function handleConnect() {
-      const code = document.getElementById('clientCodeInput').value.trim().toUpperCase();
+      const code = document.getElementById('clientCodeInput').value.trim();
       if (code) {
         connectClient(code);
       }
@@ -659,15 +577,46 @@
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
 
-      // Load Botpress chat with client context
-      const chatFrame = document.getElementById('botpressChat');
-      chatFrame.src = BOTPRESS_URL + '&userId=' + encodeURIComponent(code);
+      // Initialize Botpress with user ID
+      initBotpress(code);
 
       // Load homework
       loadHomework();
 
       // Load saved notes
       loadNotes();
+    }
+
+    function initBotpress(userId) {
+      if (botpressLoaded) {
+        // If already loaded, just update the user
+        window.botpress.updateUser({ id: userId });
+        window.botpress.open();
+        return;
+      }
+
+      window.botpress.init({
+        configUrl: BOTPRESS_CONFIG_URL,
+        hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
+        containerSelector: '#bp-webchat-container',
+        userData: {
+          id: userId
+        },
+        configuration: {
+          variant: 'solid',
+          showPoweredBy: false,
+          showOpenToggle: false,
+          containerWidth: '100%',
+          layoutWidth: '100%'
+        }
+      });
+
+      botpressLoaded = true;
+      
+      // Open the chat
+      setTimeout(() => {
+        window.botpress.open();
+      }, 500);
     }
 
     function disconnect() {
@@ -678,9 +627,13 @@
       document.getElementById('welcomeView').style.display = 'flex';
       document.getElementById('connectedView').style.display = 'none';
       document.getElementById('clientCodeInput').value = '';
-      document.getElementById('botpressChat').src = '';
       
-      // Clear homework display
+      // Close botpress
+      if (window.botpress) {
+        window.botpress.close();
+      }
+      
+      // Clear displays
       renderHomework([]);
     }
 
@@ -697,7 +650,6 @@
           .order('assigned_date', { ascending: false });
 
         if (error) throw error;
-
         renderHomework(data || []);
       } catch (err) {
         console.error('Error loading homework:', err);
@@ -707,10 +659,7 @@
 
     function renderHomework(items) {
       const html = items.length === 0 
-        ? `<div class="homework-empty">
-            <div class="homework-empty-icon">📝</div>
-            <p>No homework right now.<br>Check back after your next session.</p>
-          </div>`
+        ? `<div class="homework-empty"><p>No homework right now.<br>Check back after your next session.</p></div>`
         : items.map(item => `
             <div class="homework-card">
               <div class="homework-type">${escapeHtml(item.homework_type)}</div>
@@ -718,7 +667,6 @@
             </div>
           `).join('');
 
-      // Update both locations
       document.getElementById('homeworkList').innerHTML = html;
       document.getElementById('sidebarHomework').innerHTML = html;
     }
@@ -726,16 +674,11 @@
     // ============================================================
     // NOTES
     // ============================================================
-    async function loadNotes() {
-      try {
-        // Try to load from localStorage first (fast)
-        const localNotes = localStorage.getItem(`aloNotes_${clientCode}`);
-        if (localNotes) {
-          document.getElementById('checkInNotes').value = localNotes;
-          document.getElementById('sidebarNotes').value = localNotes;
-        }
-      } catch (err) {
-        console.log('Error loading notes:', err);
+    function loadNotes() {
+      const localNotes = localStorage.getItem(`aloNotes_${clientCode}`);
+      if (localNotes) {
+        document.getElementById('checkInNotes').value = localNotes;
+        document.getElementById('sidebarNotes').value = localNotes;
       }
     }
 
@@ -743,7 +686,6 @@
       const notes = e.target.value;
       localStorage.setItem(`aloNotes_${clientCode}`, notes);
       
-      // Debounced save indicator
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
         showSavedIndicator('notesSaved');
@@ -763,27 +705,22 @@
     function showSavedIndicator(elementId) {
       const indicator = document.getElementById(elementId);
       indicator.classList.add('visible');
-      setTimeout(() => {
-        indicator.classList.remove('visible');
-      }, 2000);
+      setTimeout(() => indicator.classList.remove('visible'), 2000);
     }
 
     // ============================================================
     // TAB NAVIGATION
     // ============================================================
     function switchTab(tabName) {
-      // Update nav
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.toggle('active', tab.dataset.tab === tabName);
       });
 
-      // Update panels
       document.querySelectorAll('.panel').forEach(panel => {
         panel.classList.remove('active');
       });
       document.getElementById(tabName + 'Panel').classList.add('active');
 
-      // Show/hide sidebar based on tab
       const main = document.getElementById('mainContent');
       const sidebar = document.getElementById('sidebar');
       
