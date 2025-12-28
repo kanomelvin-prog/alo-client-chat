@@ -15,6 +15,7 @@
       --charcoal: #2D2A26;
       --sage: #8B9A7D;
       --sage-light: #E8EDE4;
+      --sage-hover: #7A8A6C;
       --border: rgba(156, 149, 137, 0.2);
     }
 
@@ -27,45 +28,58 @@
       min-height: 100vh;
     }
 
-    .page-container {
+    /* ==================== LAYOUT ==================== */
+    .app-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
       background: var(--warm-white);
       box-shadow: 0 0 40px rgba(0,0,0,0.05);
     }
 
-    .connected-header {
+    /* Header */
+    .app-header {
       background: var(--sage);
       color: white;
       padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 500;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .status {
+    .header-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
-    .status::before {
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .connection-badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .connection-badge::before {
       content: '';
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       background: #90EE90;
       border-radius: 50%;
-      animation: pulse 2s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    .connection-badge.disconnected::before {
+      background: #ff6b6b;
     }
 
     .header-actions {
@@ -74,28 +88,197 @@
     }
 
     .header-btn {
-      padding: 6px 12px;
+      padding: 6px 14px;
       background: rgba(255,255,255,0.2);
       border: 1px solid rgba(255,255,255,0.3);
       border-radius: 6px;
       color: white;
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
     }
+    .header-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .header-btn:hover {
-      background: rgba(255,255,255,0.3);
+    /* Main content */
+    .main-content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      min-height: 0;
     }
 
-    /* Main chat area - the webchat goes here */
+    @media (max-width: 768px) {
+      .main-content { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+
+    /* Chat area */
     .chat-area {
-      flex: 1;
       position: relative;
       min-height: 0;
       overflow: hidden;
+      background: var(--warm-white);
     }
 
-    /* Loading state */
+    /* Sidebar */
+    .sidebar {
+      background: var(--cream);
+      border-left: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-section h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--stone);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Homework */
+    .homework-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--sage);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .homework-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--sage);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .homework-desc {
+      font-size: 13px;
+      color: var(--charcoal);
+      line-height: 1.4;
+    }
+    .homework-empty {
+      color: var(--stone);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px 8px;
+      background: white;
+      border-radius: 6px;
+      border: 1px dashed var(--border);
+    }
+
+    /* Notes */
+    .notes-textarea {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      background: white;
+    }
+    .notes-textarea:focus {
+      outline: none;
+      border-color: var(--sage);
+    }
+    .notes-textarea:disabled {
+      background: var(--cream);
+      color: var(--stone);
+    }
+
+    .send-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .send-btn:hover { background: var(--sage-hover); }
+    .send-btn:disabled { background: var(--stone); cursor: not-allowed; }
+
+    .notes-hint {
+      font-size: 11px;
+      color: var(--stone);
+      margin-top: 6px;
+    }
+
+    .sent-confirmation {
+      background: var(--sage-light);
+      color: var(--sage-hover);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+    .sent-confirmation.visible { display: block; }
+
+    /* ==================== LOGIN OVERLAY ==================== */
+    .login-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    }
+    .login-overlay.hidden { display: none; }
+
+    .login-box {
+      text-align: center;
+      max-width: 320px;
+    }
+    .login-box h2 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      color: var(--charcoal);
+    }
+    .login-box p {
+      color: var(--stone);
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .login-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--sage);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .login-btn:hover { background: var(--sage-hover); }
+
+    /* ==================== LOADING OVERLAY ==================== */
     .loading-overlay {
       position: absolute;
       inset: 0;
@@ -106,42 +289,30 @@
       justify-content: center;
       z-index: 10;
     }
-
     .loading-overlay.hidden { display: none; }
 
     .loading-spinner {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border: 3px solid var(--sage-light);
       border-top-color: var(--sage);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .loading-text {
-      margin-top: 16px;
+      margin-top: 12px;
       color: var(--stone);
       font-size: 14px;
     }
 
-    /* =============================================
-       CRITICAL: Force Botpress webchat INTO container
-       ============================================= */
-    
-    /* Hide the floating FAB button globally */
-    .bpFab {
-      display: none !important;
-    }
+    /* ==================== BOTPRESS OVERRIDES ==================== */
+    .bpFab { display: none !important; }
 
-    /* The webchat popup - force it into our container */
     .bpWebchat {
       position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
+      inset: 0 !important;
       width: 100% !important;
       height: 100% !important;
       max-width: 100% !important;
@@ -152,82 +323,146 @@
       margin: 0 !important;
     }
 
-    /* Force the webchat to be visible and positioned in flow */
-    .bpWebchat[class*="open"],
-    .bpWebchat[data-state="opened"] {
-      position: absolute !important;
-      inset: 0 !important;
-    }
+    /* Hide Botpress header - we have our own */
+    .bpHeaderContainer { display: none !important; }
 
-    /* Hide the header since we have our own */
-    .bpHeaderContainer {
-      display: none !important;
-    }
-
-    /* Style messages */
+    /* Message styling */
     .bpMessageBubble[data-direction="incoming"] {
       background: var(--sage-light) !important;
       color: var(--charcoal) !important;
     }
-
     .bpMessageBubble[data-direction="outgoing"] {
       background: var(--sage) !important;
       color: white !important;
     }
-
-    /* Composer styling */
-    .bpComposerContainer {
-      background: var(--warm-white) !important;
-      border-top: 1px solid var(--border) !important;
-    }
   </style>
 </head>
 <body>
-  <div class="page-container">
-    <div class="connected-header">
-      <span class="status">Connected as: <strong id="clientName">CLIENTNAME-002</strong></span>
-      <div class="header-actions">
-        <button class="header-btn" onclick="newConversation()">New Chat</button>
-        <span id="connectionStatus">Online</span>
-      </div>
-    </div>
 
-    <div class="chat-area" id="chatArea">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Connecting to Alo...</div>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="logo">Alo</span>
+        <span class="connection-badge disconnected" id="connectionBadge">Not connected</span>
       </div>
-      <!-- Botpress will render here -->
+      <div class="header-actions" id="headerActions" style="display: none;">
+        <button class="header-btn" onclick="newConversation()">New Chat</button>
+        <button class="header-btn" onclick="disconnect()">Disconnect</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Chat Area -->
+      <div class="chat-area" id="chatArea">
+        <!-- Login Overlay -->
+        <div class="login-overlay" id="loginOverlay">
+          <div class="login-box">
+            <h2>Welcome to Alo</h2>
+            <p>Your thinking partner between therapy sessions. Enter your client code to get started.</p>
+            <input type="text" class="login-input" id="clientCodeInput" placeholder="e.g. ClientName-001">
+            <button class="login-btn" onclick="connect()">Connect</button>
+          </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay hidden" id="loadingOverlay">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Connecting to Alo...</div>
+        </div>
+
+        <!-- Botpress renders here -->
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+          <h3>📋 Your Homework</h3>
+          <div id="homeworkList">
+            <div class="homework-empty">Connect to see your homework</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📝 Notes for Therapist</h3>
+          <textarea 
+            class="notes-textarea" 
+            id="notesTextarea" 
+            placeholder="Write something to share with your therapist..."
+            disabled
+          ></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendNote()" disabled>
+            Send to Therapist
+          </button>
+          <p class="notes-hint">Your therapist will see this before your next session</p>
+          <div class="sent-confirmation" id="sentConfirmation">
+            ✓ Sent successfully!
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <!-- Botpress Webchat v3.3 -->
   <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
-  
+
   <script>
-    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
-    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
+    // ==================== CONFIGURATION ====================
+    const CONFIG = {
+      supabaseUrl: 'https://lelsdezstbnzyxvsvbyx.supabase.co',
+      supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas',
+      botId: 'fc0fad71-daea-4d22-adf5-3a659042d46a',
+      clientId: 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e'
+    };
 
-    function hideLoading() {
-      document.getElementById('loadingOverlay').classList.add('hidden');
-    }
+    // ==================== STATE ====================
+    let clientCode = null;
+    let db = null;
+    let botpressReady = false;
 
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize Supabase
+      db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+      // Check for saved client code
+      const saved = localStorage.getItem('aloClientCode');
+      if (saved) {
+        document.getElementById('clientCodeInput').value = saved;
+        // Auto-connect if previously connected
+        connect();
+      }
+
+      // Enter key to connect
+      document.getElementById('clientCodeInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') connect();
+      });
+
+      // Initialize Botpress
+      initBotpress();
+    });
+
+    // ==================== BOTPRESS ====================
     function initBotpress() {
       if (typeof window.botpress === 'undefined') {
         console.error('Botpress not loaded');
-        document.getElementById('loadingOverlay').innerHTML = 
-          '<p style="color: #c53030;">Failed to load chat. Please refresh.</p>';
         return;
       }
 
-      // Event listeners
       window.botpress.on('webchat:ready', () => {
         console.log('Webchat ready');
-        hideLoading();
-        window.botpress.open();
+        botpressReady = true;
         
-        // CRITICAL: Move the webchat element into our container
-        setTimeout(moveWebchatToContainer, 100);
+        // Only show chat if already connected
+        if (clientCode) {
+          document.getElementById('loadingOverlay').classList.add('hidden');
+          window.botpress.open();
+          setTimeout(moveWebchatToContainer, 100);
+        }
       });
 
       window.botpress.on('webchat:opened', () => {
@@ -235,10 +470,9 @@
         moveWebchatToContainer();
       });
 
-      // Initialize
       window.botpress.init({
-        botId: BOT_ID,
-        clientId: CLIENT_ID,
+        botId: CONFIG.botId,
+        clientId: CONFIG.clientId,
         configuration: {
           color: '#8B9A7D',
           variant: 'soft',
@@ -250,42 +484,182 @@
           showPoweredBy: false
         }
       });
-
-      console.log('Botpress init called');
     }
 
-    // Move the Botpress webchat element into our container
     function moveWebchatToContainer() {
       const webchat = document.querySelector('.bpWebchat');
       const container = document.getElementById('chatArea');
       
       if (webchat && container && webchat.parentElement !== container) {
         container.appendChild(webchat);
-        console.log('Moved webchat into container');
       }
 
-      // Also hide the FAB if it exists
       const fab = document.querySelector('.bpFab');
-      if (fab) {
-        fab.style.display = 'none';
+      if (fab) fab.style.display = 'none';
+    }
+
+    // ==================== CONNECTION ====================
+    function connect() {
+      const input = document.getElementById('clientCodeInput').value.trim();
+      if (!input) return;
+
+      // Normalize to uppercase
+      clientCode = input.toUpperCase();
+      localStorage.setItem('aloClientCode', clientCode);
+
+      // Update UI
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+      
+      const badge = document.getElementById('connectionBadge');
+      badge.textContent = clientCode;
+      badge.classList.remove('disconnected');
+      
+      document.getElementById('headerActions').style.display = 'flex';
+      document.getElementById('notesTextarea').disabled = false;
+      document.getElementById('sendBtn').disabled = false;
+
+      // Load homework
+      loadHomework();
+
+      // Show chat if botpress ready
+      if (botpressReady) {
+        document.getElementById('loadingOverlay').classList.add('hidden');
+        window.botpress.open();
+        setTimeout(moveWebchatToContainer, 100);
+      }
+    }
+
+    function disconnect() {
+      clientCode = null;
+      localStorage.removeItem('aloClientCode');
+      
+      // Update UI
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      document.getElementById('clientCodeInput').value = '';
+      
+      const badge = document.getElementById('connectionBadge');
+      badge.textContent = 'Not connected';
+      badge.classList.add('disconnected');
+      
+      document.getElementById('headerActions').style.display = 'none';
+      document.getElementById('notesTextarea').disabled = true;
+      document.getElementById('notesTextarea').value = '';
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('homeworkList').innerHTML = 
+        '<div class="homework-empty">Connect to see your homework</div>';
+      document.getElementById('sentConfirmation').classList.remove('visible');
+
+      // Close chat
+      if (window.botpress) {
+        window.botpress.close();
       }
     }
 
     function newConversation() {
       if (window.botpress) {
-        // Try to reset/create new conversation
         window.botpress.close();
         setTimeout(() => {
           window.botpress.open();
+          moveWebchatToContainer();
         }, 100);
       }
     }
 
-    // Initialize when ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(initBotpress, 100));
-    } else {
-      setTimeout(initBotpress, 100);
+    // ==================== HOMEWORK ====================
+    async function loadHomework() {
+      if (!clientCode || !db) return;
+
+      try {
+        const { data, error } = await db
+          .from('homework')
+          .select('*')
+          .eq('client_code', clientCode)
+          .eq('active', true)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Homework error:', error);
+          return;
+        }
+
+        renderHomework(data || []);
+      } catch (e) {
+        console.error('Homework exception:', e);
+      }
+    }
+
+    function renderHomework(items) {
+      const container = document.getElementById('homeworkList');
+      
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="homework-empty">
+            No homework right now.<br>
+            <small>Check back after your next session.</small>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="homework-card">
+          <div class="homework-type">${escapeHtml(item.homework_type || 'Task')}</div>
+          <div class="homework-desc">${escapeHtml(item.description || '')}</div>
+        </div>
+      `).join('');
+    }
+
+    // ==================== NOTES ====================
+    async function sendNote() {
+      const textarea = document.getElementById('notesTextarea');
+      const text = textarea.value.trim();
+      
+      if (!text || !clientCode || !db) return;
+
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const { error } = await db
+          .from('client_messages')
+          .insert({
+            client_code: clientCode,
+            message: text
+          });
+
+        if (error) {
+          console.error('Send note error:', error);
+          alert('Failed to send. Please try again.');
+          btn.disabled = false;
+          btn.textContent = 'Send to Therapist';
+          return;
+        }
+
+        // Success
+        textarea.value = '';
+        btn.textContent = 'Send to Therapist';
+        btn.disabled = false;
+        
+        const confirmation = document.getElementById('sentConfirmation');
+        confirmation.classList.add('visible');
+        setTimeout(() => confirmation.classList.remove('visible'), 3000);
+
+      } catch (e) {
+        console.error('Send note exception:', e);
+        alert('Failed to send. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Send to Therapist';
+      }
+    }
+
+    // ==================== UTILITIES ====================
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
   </script>
 </body>
