@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alo — Your Thinking Partner</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  
+  <title>Alo - Your Therapeutic Companion</title>
   <style>
+    /* ============================================
+       ALO DESIGN SYSTEM - "Sage and Cream" Palette
+       ============================================ */
     :root {
       --cream: #FDFBF7;
       --warm-white: #FAF8F5;
@@ -16,589 +15,445 @@
       --charcoal: #2D2A26;
       --sage: #8B9A7D;
       --sage-light: #E8EDE4;
-      --sage-hover: #7A8A6C;
       --border: rgba(156, 149, 137, 0.2);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--cream);
       color: var(--charcoal);
       min-height: 100vh;
     }
 
-    .header {
-      background: var(--warm-white);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-    }
-
-    .logo {
-      font-family: 'Newsreader', serif;
-      font-size: 1.5rem;
-      font-weight: 400;
-    }
-    .logo span { color: var(--sage); }
-
-    .nav-tabs { display: flex; gap: 0.5rem; }
-
-    .nav-tab {
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      color: var(--stone);
-      cursor: pointer;
-    }
-    .nav-tab:hover { background: rgba(139, 154, 125, 0.1); }
-    .nav-tab.active { background: var(--sage-light); color: var(--sage-hover); font-weight: 500; }
-
-    .main {
-      margin-top: 60px;
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      min-height: calc(100vh - 60px);
-    }
-    @media (max-width: 900px) {
-      .main { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-    }
-
-    .chat-container {
+    /* ============================================
+       PAGE LAYOUT
+       ============================================ */
+    .page-container {
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 60px);
-    }
-
-    .sidebar {
+      height: 100vh;
+      max-width: 800px;
+      margin: 0 auto;
       background: var(--warm-white);
-      border-left: 1px solid var(--border);
-      padding: 1.5rem;
+      box-shadow: 0 0 40px rgba(0,0,0,0.05);
     }
 
-    .section-title {
-      font-family: 'Newsreader', serif;
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 1rem;
-    }
-
-    .homework-card {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-    }
-    .homework-type {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--sage);
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-    }
-    .homework-description { font-size: 0.875rem; }
-    .homework-empty { text-align: center; padding: 2rem; color: var(--stone); font-size: 0.875rem; }
-
-    .notes-textarea {
-      width: 100%;
-      min-height: 120px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      background: var(--cream);
-      resize: none;
-      margin-top: 1.5rem;
-    }
-    .notes-textarea:focus { outline: none; border-color: var(--sage); }
-    .notes-hint { font-size: 0.75rem; color: var(--stone); margin-top: 0.5rem; }
-
-    .welcome-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem;
-      text-align: center;
-      flex: 1;
-    }
-    .welcome-container h2 {
-      font-family: 'Newsreader', serif;
-      font-size: 1.5rem;
-      font-weight: 400;
-      margin-bottom: 0.75rem;
-    }
-    .welcome-container p { color: var(--stone); margin-bottom: 1.5rem; max-width: 400px; }
-
-    .client-code-input { display: flex; gap: 0.75rem; max-width: 320px; }
-    .client-code-input input {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 1rem;
-      background: var(--warm-white);
-    }
-    .client-code-input input:focus { outline: none; border-color: var(--sage); }
-    .client-code-input button {
-      padding: 0.75rem 1.5rem;
+    /* Header */
+    .connected-header {
       background: var(--sage);
       color: white;
-      border: none;
-      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 14px;
       font-weight: 500;
-      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .client-code-input button:hover { background: var(--sage-hover); }
 
-    .connected-header {
-      padding: 0.75rem 1.5rem;
-      background: var(--sage-light);
+    .connected-header .status {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 8px;
     }
-    .connected-info { font-size: 0.875rem; color: var(--sage-hover); }
-    .disconnect-btn {
-      padding: 0.4rem 0.75rem;
-      background: transparent;
-      border: 1px solid var(--sage);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: var(--sage-hover);
-      cursor: pointer;
+
+    .connected-header .status::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #90EE90;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
     }
-    .disconnect-btn:hover { background: var(--sage); color: white; }
 
-    .new-chat-btn {
-      padding: 0.4rem 0.75rem;
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: var(--charcoal);
-      cursor: pointer;
-      margin-left: 0.5rem;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
-    .new-chat-btn:hover { background: var(--border); }
 
-    .panel { display: none; }
-    .panel.active { display: flex; flex-direction: column; flex: 1; }
-    .main.chat-only { grid-template-columns: 1fr; }
-    .main.chat-only .sidebar { display: none; }
-
-    /* Botpress container - fills remaining space */
-    #bp-webchat-container {
+    /* Chat Container */
+    .chat-container {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: var(--cream);
+      min-height: 0;
+      position: relative;
+    }
+
+    /* Webchat wrapper - THIS IS THE KEY CONTAINER */
+    #bp-webchat-container {
+      flex: 1;
       position: relative;
       min-height: 400px;
+      background: var(--warm-white);
     }
 
-    /* Override Botpress default styles to match Alo theme */
-    #bp-webchat-container .bpw-layout {
-      background: var(--cream) !important;
-      font-family: 'DM Sans', sans-serif !important;
+    /* Homework Section */
+    .homework-section {
+      background: var(--sage-light);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px;
     }
 
-    #bp-webchat-container .bpw-header-container {
-      background: var(--sage) !important;
+    .homework-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
     }
 
-    #bp-webchat-container .bpw-bot-avatar {
-      background: var(--sage) !important;
+    .homework-item {
+      background: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--sage);
     }
 
-    #bp-webchat-container .bpw-from-bot .bpw-chat-bubble {
-      background: var(--warm-white) !important;
+    .homework-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .homework-item .task {
+      font-size: 14px;
+      color: var(--charcoal);
+    }
+
+    .homework-item .due {
+      font-size: 12px;
+      color: var(--stone);
+      margin-top: 4px;
+    }
+
+    /* ============================================
+       BOTPRESS WEBCHAT OVERRIDES
+       These CSS rules style the embedded webchat
+       ============================================ */
+
+    /* Hide the floating action button (FAB) */
+    #bp-webchat-container .bpFab {
+      display: none !important;
+    }
+
+    /* Make webchat fill the container */
+    #bp-webchat-container .bpWebchat {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      max-width: 100% !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* Override Botpress header if visible */
+    #bp-webchat-container .bpHeaderContainer {
+      display: none !important; /* Hide since we have our own header */
+    }
+
+    /* Style message bubbles - bot messages */
+    #bp-webchat-container .bpMessageBubble[data-direction="incoming"] {
+      background: var(--sage-light) !important;
       color: var(--charcoal) !important;
-      border: 1px solid var(--border) !important;
+      border-radius: 16px 16px 16px 4px !important;
     }
 
-    #bp-webchat-container .bpw-from-user .bpw-chat-bubble {
+    /* Style message bubbles - user messages */
+    #bp-webchat-container .bpMessageBubble[data-direction="outgoing"] {
       background: var(--sage) !important;
       color: white !important;
+      border-radius: 16px 16px 4px 16px !important;
     }
 
-    #bp-webchat-container .bpw-composer {
+    /* Composer/input area */
+    #bp-webchat-container .bpComposerContainer {
       background: var(--warm-white) !important;
       border-top: 1px solid var(--border) !important;
     }
 
-    #bp-webchat-container .bpw-composer textarea {
-      font-family: 'DM Sans', sans-serif !important;
+    #bp-webchat-container .bpComposerInput {
+      background: white !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 24px !important;
     }
 
-    #bp-webchat-container .bpw-send-button {
+    /* Send button */
+    #bp-webchat-container .bpSendButton {
       background: var(--sage) !important;
+      border-radius: 50% !important;
     }
 
-    #bp-webchat-container .bpw-send-button:hover {
-      background: var(--sage-hover) !important;
+    /* Loading indicator */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .loading-overlay.hidden {
+      display: none;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--sage-light);
+      border-top-color: var(--sage);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 16px;
+      color: var(--stone);
+      font-size: 14px;
+    }
+
+    /* Error state */
+    .error-message {
+      padding: 20px;
+      text-align: center;
+      color: #c53030;
+      background: #fff5f5;
+      border: 1px solid #feb2b2;
+      border-radius: 8px;
+      margin: 20px;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="logo">Alo<span>.</span></div>
-    <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="chat">Talk with Alo</button>
-      <button class="nav-tab" data-tab="homework">Homework</button>
-      <button class="nav-tab" data-tab="notes">Notes for Therapist</button>
-    </nav>
-  </header>
-
-  <main class="main" id="mainContent">
-    <div class="panel active" id="chatPanel">
-      <div class="chat-container">
-        <div class="welcome-container" id="welcomeView">
-          <h2>Welcome to Alo</h2>
-          <p>Your thinking partner between sessions. Enter your client code to get started.</p>
-          <div class="client-code-input">
-            <input type="text" id="clientCodeInput" placeholder="Your code (e.g., ClientName-001)">
-            <button id="connectBtn">Connect</button>
-          </div>
-        </div>
-
-        <div id="connectedView" style="display: none; flex: 1; flex-direction: column;">
-          <div class="connected-header">
-            <span class="connected-info">Connected as: <strong id="connectedCode"></strong></span>
-            <div>
-              <button class="new-chat-btn" onclick="startNewChat()">New Chat</button>
-              <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
-            </div>
-          </div>
-          <div id="bp-webchat-container"></div>
-        </div>
-      </div>
+  <div class="page-container">
+    <!-- Custom Header -->
+    <div class="connected-header">
+      <span class="status">Connected as: <strong id="client-name">CLIENTNAME-002</strong></span>
+      <span id="connection-status">Online</span>
     </div>
 
-    <div class="panel" id="homeworkPanel">
-      <div style="padding: 2rem; flex: 1;">
-        <h2 class="section-title">Your Homework</h2>
-        <p style="color: var(--stone); font-size: 0.875rem; margin-bottom: 1.5rem;">
-          These are things your therapist thought might be helpful to explore.
-        </p>
-        <div id="homeworkList">
-          <div class="homework-empty">No homework right now.<br>Check back after your next session.</div>
-        </div>
+    <!-- Chat Container -->
+    <div class="chat-container">
+      <!-- Loading Overlay -->
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Connecting to Alo...</div>
       </div>
+
+      <!-- Error Message -->
+      <div class="error-message" id="error-message"></div>
+
+      <!-- Botpress Webchat Container -->
+      <div id="bp-webchat-container"></div>
     </div>
 
-    <div class="panel" id="notesPanel">
-      <div style="padding: 2rem; flex: 1;">
-        <h2 class="section-title">Notes for Your Therapist</h2>
-        <p style="color: var(--stone); font-size: 0.875rem; margin-bottom: 1rem;">
-          Write down anything you want to share before your next session.
-        </p>
-        <textarea class="notes-textarea" id="notesTextarea" placeholder="What's been on your mind?"></textarea>
-        <button onclick="sendNote()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--sage); color: white; border: none; border-radius: 8px; cursor: pointer;">Send to Therapist</button>
-        <p class="notes-hint">Your therapist will see this before your next session.</p>
-        <div id="sentMessages" style="margin-top: 1.5rem;"></div>
+    <!-- Homework Section (optional - can be toggled) -->
+    <div class="homework-section" id="homework-section" style="display: none;">
+      <h3>📋 Your Homework</h3>
+      <div id="homework-list">
+        <!-- Homework items will be dynamically inserted here -->
       </div>
     </div>
+  </div>
 
-    <aside class="sidebar" id="sidebar">
-      <h3 class="section-title">Your Homework</h3>
-      <div id="sidebarHomework">
-        <div class="homework-empty">No homework right now.</div>
-      </div>
-      <h3 class="section-title" style="margin-top: 1.5rem;">Notes for Therapist</h3>
-      <textarea class="notes-textarea" id="sidebarNotes" placeholder="Something to share..."></textarea>
-      <p class="notes-hint">Your therapist will see this.</p>
-    </aside>
-  </main>
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- ============================================
+       BOTPRESS WEBCHAT V3 INTEGRATION
+       ============================================ -->
+  
+  <!-- Load Botpress inject.js - USE V3.3 (latest stable) -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
 
   <script>
-    // ============================================================
+    // ============================================
     // CONFIGURATION
-    // ============================================================
-    const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
-    
-    // Botpress configuration - from your bot export
-    const BOTPRESS_BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
-    const BOTPRESS_CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
-
-    // ============================================================
-    // STATE
-    // ============================================================
-    let clientCode = localStorage.getItem('aloClientCode') || null;
-    let db = null;
-    let webchatInitialized = false;
-    let botpressLoaded = false;
-
-    // ============================================================
-    // BOTPRESS LOADER - ensures script is ready before calling init
-    // ============================================================
-    function loadBotpressInject(callback) {
-      // Already loaded and ready
-      if (window.botpressWebChat?.init) {
-        botpressLoaded = true;
-        return callback();
+    // ============================================
+    const ALO_CONFIG = {
+      // Your Botpress bot credentials
+      botId: 'fc0fad71-daea-4d22-adf5-3a659042d46a',
+      clientId: 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e',
+      
+      // Theming - matches your "Sage and Cream" palette
+      configuration: {
+        color: '#8B9A7D',        // Sage - primary color
+        variant: 'soft',         // 'soft' or 'solid' - soft is more subtle
+        themeMode: 'light',      // 'light' or 'dark'
+        fontFamily: 'Inter',     // Match your site font
+        radius: 2,               // Corner radius (0.5-4)
+        
+        // Bot identity
+        botName: 'Alo',
+        botDescription: 'Your therapeutic companion',
+        // botAvatar: 'https://your-domain.com/alo-avatar.png', // Optional
+        
+        // Feature toggles
+        showPoweredBy: false,    // Hide "Powered by Botpress"
+        enableTranscriptDownload: false,
+        
+        // Composer settings
+        composerPlaceholder: 'Share what\'s on your mind...',
       }
+    };
 
-      // Script exists but still loading
-      const existing = document.querySelector('script[data-bp="inject"]');
-      if (existing) {
-        existing.addEventListener('load', () => {
-          botpressLoaded = true;
-          callback();
-        });
-        return;
-      }
-
-      // Load the script
-      const script = document.createElement('script');
-      script.src = 'https://cdn.botpress.cloud/webchat/v2.2/inject.js';
-      script.async = true;
-      script.dataset.bp = 'inject';
-      script.onload = () => {
-        botpressLoaded = true;
-        callback();
-      };
-      script.onerror = () => {
-        console.error('Failed to load Botpress webchat script');
-      };
-      document.head.appendChild(script);
-    }
-
-    // ============================================================
+    // ============================================
     // INITIALIZATION
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', () => {
-      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      
-      if (clientCode) {
-        connectClient(clientCode);
-      }
+    // ============================================
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const errorMessage = document.getElementById('error-message');
 
-      document.getElementById('connectBtn').addEventListener('click', handleConnect);
-      document.getElementById('clientCodeInput').addEventListener('keypress', e => {
-        if (e.key === 'Enter') handleConnect();
-      });
-
-      document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-      });
-
-      // Sync notes between panel and sidebar
-      document.getElementById('notesTextarea').addEventListener('input', e => {
-        document.getElementById('sidebarNotes').value = e.target.value;
-      });
-      document.getElementById('sidebarNotes').addEventListener('input', e => {
-        document.getElementById('notesTextarea').value = e.target.value;
-      });
-    });
-
-    // ============================================================
-    // CLIENT CONNECTION
-    // ============================================================
-    function handleConnect() {
-      const code = document.getElementById('clientCodeInput').value.trim();
-      if (code) connectClient(code);
+    function showError(message) {
+      loadingOverlay.classList.add('hidden');
+      errorMessage.textContent = message;
+      errorMessage.classList.add('visible');
     }
 
-    function connectClient(code) {
-      // Normalize to uppercase to match dashboard
-      clientCode = code.trim().toUpperCase();
-      localStorage.setItem('aloClientCode', clientCode);
-      
-      document.getElementById('welcomeView').style.display = 'none';
-      document.getElementById('connectedView').style.display = 'flex';
-      document.getElementById('connectedCode').textContent = clientCode;
-      
-      // Load Botpress first, THEN initialize webchat
-      loadBotpressInject(() => {
-        initWebchat(clientCode);
-      });
-      
-      loadHomework();
-      loadSentMessages();
+    function hideLoading() {
+      loadingOverlay.classList.add('hidden');
     }
 
-    function initWebchat(userId) {
-      // Clear any existing webchat
-      const container = document.getElementById('bp-webchat-container');
-      container.innerHTML = '';
-      
-      if (!window.botpressWebChat?.init) {
-        console.error('Botpress webchat not loaded');
-        container.innerHTML = '<p style="padding: 2rem; color: var(--stone); text-align: center;">Chat loading failed. Please refresh the page.</p>';
+    // Wait for botpress to be available
+    function initBotpress() {
+      if (typeof window.botpress === 'undefined') {
+        console.error('Botpress script not loaded');
+        showError('Failed to load chat. Please refresh the page.');
         return;
       }
-      
-      // Initialize Botpress webchat with theme matching Alo
-      // Note: container goes INSIDE the config object, not as second argument
-      window.botpressWebChat.init({
-        botId: BOTPRESS_BOT_ID,
-        clientId: BOTPRESS_CLIENT_ID,
-        hostUrl: 'https://cdn.botpress.cloud/webchat/v2.2',
-        messagingUrl: 'https://messaging.botpress.cloud',
-        
-        // Container - MUST be inside config, not second argument
-        container: '#bp-webchat-container',
-        
-        // User identification
-        userId: userId,
-        
-        // Layout options
-        hideWidget: true,
-        showCloseButton: false,
-        disableAnimations: false,
-        enableConversationDeletion: true,
-        showPoweredBy: false,
-        
-        // Theme customization to match Alo
-        themeName: 'prism',
-        themeColor: '#8B9A7D',
-        
-        // Placeholder text
-        composerPlaceholder: 'Type your message...',
-        botConversationDescription: 'Your thinking partner between sessions',
-      });
 
-      // Auto-show the chat after init
-      setTimeout(() => {
-        if (window.botpressWebChat?.sendEvent) {
-          window.botpressWebChat.sendEvent({ type: 'show' });
-        }
-      }, 500);
-      
-      webchatInitialized = true;
-    }
+      try {
+        // Listen for webchat events
+        window.botpress.on('webchat:ready', () => {
+          console.log('Webchat ready');
+          hideLoading();
+          // Auto-open the webchat (it's embedded, so this shows the chat interface)
+          window.botpress.open();
+        });
 
-    function startNewChat() {
-      if (window.botpressWebChat?.sendEvent) {
-        window.botpressWebChat.sendEvent({ type: 'resetConversation' });
+        window.botpress.on('webchat:opened', () => {
+          console.log('Webchat opened');
+        });
+
+        window.botpress.on('webchat:closed', () => {
+          console.log('Webchat closed');
+          // Re-open if closed (since we want it always visible)
+          window.botpress.open();
+        });
+
+        window.botpress.on('message', (event) => {
+          console.log('Message received:', event);
+        });
+
+        window.botpress.on('error', (error) => {
+          console.error('Webchat error:', error);
+          showError('Connection error. Please refresh the page.');
+        });
+
+        // Initialize the webchat
+        window.botpress.init({
+          botId: ALO_CONFIG.botId,
+          clientId: ALO_CONFIG.clientId,
+          configuration: ALO_CONFIG.configuration,
+          
+          // CRITICAL: This selector tells Botpress where to render
+          selector: '#bp-webchat-container',
+          
+          // Optional: Pass user data to the bot
+          // userData: {
+          //   clientId: 'CLIENTNAME-002',
+          //   // Add any other user context here
+          // }
+        });
+
+        console.log('Botpress init called');
+
+      } catch (err) {
+        console.error('Botpress initialization error:', err);
+        showError('Failed to initialize chat: ' + err.message);
       }
-      // Reinitialize as backup
-      setTimeout(() => {
-        loadBotpressInject(() => initWebchat(clientCode));
-      }, 300);
     }
 
-    function disconnect() {
-      clientCode = null;
-      localStorage.removeItem('aloClientCode');
-      document.getElementById('welcomeView').style.display = 'flex';
-      document.getElementById('connectedView').style.display = 'none';
-      document.getElementById('clientCodeInput').value = '';
-      
-      // Clear webchat
-      const container = document.getElementById('bp-webchat-container');
-      container.innerHTML = '';
-      webchatInitialized = false;
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBotpress);
+    } else {
+      // Small delay to ensure inject.js has fully loaded
+      setTimeout(initBotpress, 100);
     }
 
-    // ============================================================
-    // HOMEWORK
-    // ============================================================
+    // ============================================
+    // HELPER FUNCTIONS FOR YOUR APP
+    // ============================================
+
+    // Send a message programmatically
+    function sendMessage(text) {
+      if (window.botpress && window.botpress.sendMessage) {
+        window.botpress.sendMessage(text);
+      }
+    }
+
+    // Send a custom event to the bot
+    function sendEvent(eventData) {
+      if (window.botpress && window.botpress.sendEvent) {
+        window.botpress.sendEvent(eventData);
+      }
+    }
+
+    // Toggle webchat visibility
+    function toggleChat() {
+      if (window.botpress) {
+        if (window.botpress.isOpen) {
+          window.botpress.close();
+        } else {
+          window.botpress.open();
+        }
+      }
+    }
+
+    // Load homework from Supabase (placeholder - connect to your backend)
     async function loadHomework() {
-      try {
-        const { data } = await db.from('homework').select('*').eq('client_code', clientCode).eq('active', true);
-        renderHomework(data || []);
-      } catch (e) { 
-        console.error('Error loading homework:', e);
-        renderHomework([]); 
-      }
-    }
-
-    function renderHomework(items) {
-      const html = items.length === 0 
-        ? '<div class="homework-empty">No homework right now.<br>Check back after your next session.</div>'
-        : items.map(i => `<div class="homework-card"><div class="homework-type">${escapeHtml(i.homework_type)}</div><div class="homework-description">${escapeHtml(i.description)}</div></div>`).join('');
-      document.getElementById('homeworkList').innerHTML = html;
-      document.getElementById('sidebarHomework').innerHTML = html;
-    }
-
-    // ============================================================
-    // NOTES TO THERAPIST
-    // ============================================================
-    async function sendNote() {
-      const text = document.getElementById('notesTextarea').value.trim();
-      if (!text || !clientCode) return;
+      const homeworkSection = document.getElementById('homework-section');
+      const homeworkList = document.getElementById('homework-list');
       
-      try {
-        await db.from('client_messages').insert({ client_code: clientCode, message: text });
-        document.getElementById('notesTextarea').value = '';
-        document.getElementById('sidebarNotes').value = '';
-        alert('Sent to therapist!');
-        loadSentMessages();
-      } catch (e) { 
-        console.error('Error sending note:', e);
-        alert('Error sending'); 
+      // TODO: Replace with actual Supabase query
+      const mockHomework = [
+        { task: 'Practice 5 minutes of mindful breathing', due: 'Daily' },
+        { task: 'Journal about your emotions', due: 'Before Thursday' }
+      ];
+
+      if (mockHomework.length > 0) {
+        homeworkSection.style.display = 'block';
+        homeworkList.innerHTML = mockHomework.map(item => `
+          <div class="homework-item">
+            <div class="task">${item.task}</div>
+            <div class="due">Due: ${item.due}</div>
+          </div>
+        `).join('');
       }
     }
 
-    async function loadSentMessages() {
-      if (!clientCode) return;
-      try {
-        const { data } = await db
-          .from('client_messages')
-          .select('*')
-          .eq('client_code', clientCode)
-          .order('created_at', { ascending: false })
-          .limit(5);
-        
-        if (data?.length) {
-          document.getElementById('sentMessages').innerHTML = 
-            '<p style="font-size:0.8rem;color:var(--stone);margin-bottom:0.5rem;">Previously sent:</p>' + 
-            data.map(m => `
-              <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:0.75rem;margin-bottom:0.5rem;font-size:0.85rem;">
-                ${escapeHtml(m.message)}
-                <br><small style="color:var(--stone);">${new Date(m.created_at).toLocaleDateString()}</small>
-              </div>
-            `).join('');
-        }
-      } catch (e) {
-        console.error('Error loading sent messages:', e);
-      }
-    }
-
-    // ============================================================
-    // TAB NAVIGATION
-    // ============================================================
-    function switchTab(tabName) {
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.getElementById(tabName + 'Panel').classList.add('active');
-      
-      const main = document.getElementById('mainContent');
-      if (tabName === 'chat' && window.innerWidth > 900) {
-        main.classList.remove('chat-only');
-      } else {
-        main.classList.add('chat-only');
-      }
-    }
-
-    // ============================================================
-    // UTILITIES
-    // ============================================================
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
+    // Uncomment to load homework on page load
+    // loadHomework();
   </script>
 </body>
 </html>
