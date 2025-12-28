@@ -356,22 +356,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      min-height: 500px;
-    }
-
-    /* Botpress container must have explicit height */
-    #bp-webchat-container {
-      flex: 1;
-      min-height: 500px;
-      height: 100%;
-      position: relative;
-    }
-
-    /* Force botpress iframe to fill container */
-    #bp-webchat-container iframe {
-      width: 100% !important;
-      height: 100% !important;
-      min-height: 500px !important;
+      min-height: 400px;
     }
 
     /* Loading */
@@ -429,8 +414,15 @@
             <span class="connected-info">Connected as: <strong id="connectedCode"></strong></span>
             <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
           </div>
-          <div class="chat-panel-content">
-            <div id="bp-webchat-container"></div>
+          <div class="chat-panel-content" style="display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center;">
+              <h2 style="font-family: 'Newsreader', serif; font-size: 1.5rem; color: var(--charcoal); margin-bottom: 0.5rem;">Ready to talk?</h2>
+              <p style="color: var(--stone); margin-bottom: 1.5rem;">Click below to start your conversation with Alo.</p>
+              <button id="startChatBtn" onclick="openAloChat()" style="padding: 1rem 2rem; background: var(--sage); color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif;">
+                💬 Start Chatting with Alo
+              </button>
+              <p style="color: var(--stone); font-size: 0.8rem; margin-top: 1rem;">The chat will open in a popup window.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -616,38 +608,26 @@
     }
 
     function initBotpress(userId) {
-      if (botpressLoaded) {
-        // If already loaded, just update the user
+      // Initialize Botpress but don't open yet
+      if (!botpressLoaded) {
+        window.botpress.init({
+          configUrl: BOTPRESS_CONFIG_URL,
+          hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
+          userData: {
+            id: userId
+          }
+        });
+        botpressLoaded = true;
+      } else {
+        // Update user if already loaded
         window.botpress.updateUser({ id: userId });
-        window.botpress.open();
-        return;
       }
-
-      window.botpress.init({
-        configUrl: BOTPRESS_CONFIG_URL,
-        hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
-        containerSelector: '#bp-webchat-container',
-        userData: {
-          id: userId
-        },
-        configuration: {
-          composerPlaceholder: "Talk to Alo...",
-          botName: "Alo",
-          showPoweredBy: false,
-          showCloseButton: false,
-          closeOnEscape: false,
-          disableAnimations: false
-        }
-      });
-
-      botpressLoaded = true;
-      
-      // Open the chat after a short delay
-      setTimeout(() => {
-        if (window.botpress && window.botpress.open) {
-          window.botpress.open();
-        }
-      }, 1000);
+    }
+    
+    function openAloChat() {
+      if (window.botpress && window.botpress.open) {
+        window.botpress.open();
+      }
     }
 
     function disconnect() {
