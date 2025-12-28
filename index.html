@@ -429,10 +429,11 @@
       // Initialize Supabase
       db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-      // Check for saved client code and auto-connect
+      // Check for saved client code
       const saved = localStorage.getItem('aloClientCode');
       if (saved) {
         document.getElementById('clientCodeInput').value = saved;
+        // Auto-connect if previously connected
         connect();
       }
 
@@ -502,9 +503,8 @@
       const input = document.getElementById('clientCodeInput').value.trim();
       if (!input) return;
 
-      // FIXED: Preserve original case (don't force uppercase)
-      // Must match exactly what's in Supabase
-      clientCode = input;
+      // Normalize to uppercase
+      clientCode = input.toUpperCase();
       localStorage.setItem('aloClientCode', clientCode);
 
       // Update UI
@@ -556,23 +556,19 @@
       }
     }
 
-    // FIXED: New Chat now properly reloads page to get fresh conversation
     function newConversation() {
-      // Clear Botpress storage to force new conversation
-      Object.keys(localStorage).forEach(key => {
-        if (key.includes('bp') || key.includes('botpress') || key.includes('webchat')) {
-          localStorage.removeItem(key);
-        }
-      });
-      // Reload page - will auto-reconnect with saved client code
-      window.location.reload();
+      if (window.botpress) {
+        window.botpress.close();
+        setTimeout(() => {
+          window.botpress.open();
+          moveWebchatToContainer();
+        }, 100);
+      }
     }
 
     // ==================== HOMEWORK ====================
     async function loadHomework() {
       if (!clientCode || !db) return;
-
-      console.log('Loading homework for:', clientCode);
 
       try {
         const { data, error } = await db
@@ -584,15 +580,12 @@
 
         if (error) {
           console.error('Homework error:', error);
-          renderHomework([]);
           return;
         }
 
-        console.log('Homework loaded:', data?.length || 0, 'items');
         renderHomework(data || []);
       } catch (e) {
         console.error('Homework exception:', e);
-        renderHomework([]);
       }
     }
 
@@ -671,3 +664,4 @@
   </script>
 </body>
 </html>
+
