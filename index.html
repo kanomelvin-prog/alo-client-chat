@@ -5,13 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alo — Your Thinking Partner</title>
   
-  <!-- BUILD INFO: v1.0.0 | 2025-12-28 | test-v3.5 -->
-  <meta name="alo-version" content="1.0.0">
-  <meta name="alo-build-date" content="2025-12-28">
-  <meta name="alo-branch" content="test-v3.5">
+  <!-- BUILD: v1.0.1 | 2025-12-28 | iframe-approach -->
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
@@ -52,6 +47,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .status {
@@ -65,15 +61,6 @@
       height: 8px;
       background: #90EE90;
       border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    .status-dot.error { background: #ff6b6b; animation: none; }
-    .status-dot.loading { background: #ffd93d; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
     }
 
     .header-btn {
@@ -88,51 +75,10 @@
 
     .header-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .chat-area {
+    .chat-frame {
       flex: 1;
-      position: relative;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .loading-overlay {
-      position: absolute;
-      inset: 0;
-      background: var(--warm-white);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      transition: opacity 0.3s;
-    }
-
-    .loading-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--sage-light);
-      border-top-color: var(--sage);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .loading-text {
-      margin-top: 16px;
-      color: var(--stone);
-      font-size: 14px;
-    }
-
-    .error-text {
-      color: #c53030;
-      margin-top: 8px;
-      font-size: 12px;
+      border: none;
+      width: 100%;
     }
 
     .version-stamp {
@@ -143,190 +89,41 @@
       color: var(--stone);
       opacity: 0.5;
     }
-
-    /* Botpress overrides */
-    .bpFab { display: none !important; }
-    
-    .bpWebchat {
-      position: absolute !important;
-      inset: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      max-width: 100% !important;
-      max-height: 100% !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-    }
-
-    .bpHeaderContainer { display: none !important; }
   </style>
 </head>
 <body>
   <div class="page-container">
     <div class="header">
       <div class="status">
-        <div class="status-dot" id="statusDot"></div>
+        <div class="status-dot"></div>
         <span>Connected as: <strong id="clientName">CLIENTNAME-002</strong></span>
       </div>
       <div>
         <button class="header-btn" onclick="newChat()">New Chat</button>
-        <span id="statusText">Connecting...</span>
+        <span>Online</span>
       </div>
     </div>
 
-    <div class="chat-area" id="chatArea">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">Connecting to Alo...</div>
-        <div class="error-text" id="errorText" style="display:none;"></div>
-      </div>
-    </div>
+    <!-- Use iframe with the KNOWN WORKING shareable URL -->
+    <iframe 
+      id="chatFrame"
+      class="chat-frame"
+      src="https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.json"
+      allow="microphone"
+    ></iframe>
   </div>
 
-  <div class="version-stamp">v1.0.0 | 2025-12-28 | test-v3.5</div>
+  <div class="version-stamp">v1.0.1 | 2025-12-28 | iframe</div>
 
-  <!-- Use v3.5 like the working shareable link -->
-  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
-  
   <script>
-    // =========================================
-    // CONFIGURATION
-    // =========================================
-    const CONFIG_URL = 'https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.json';
+    console.log('[Alo] Page loaded - v1.0.1 | 2025-12-28 | iframe-approach');
     
-    // =========================================
-    // STATE
-    // =========================================
-    let initAttempts = 0;
-    const MAX_ATTEMPTS = 3;
-
-    // =========================================
-    // UI HELPERS
-    // =========================================
-    function setStatus(status, text) {
-      const dot = document.getElementById('statusDot');
-      const statusText = document.getElementById('statusText');
-      
-      dot.className = 'status-dot ' + status;
-      statusText.textContent = text;
-    }
-
-    function hideLoading() {
-      document.getElementById('loadingOverlay').classList.add('hidden');
-    }
-
-    function showError(msg) {
-      document.getElementById('loadingText').textContent = 'Connection failed';
-      document.getElementById('errorText').textContent = msg;
-      document.getElementById('errorText').style.display = 'block';
-      setStatus('error', 'Offline');
-    }
-
-    function moveWebchatToContainer() {
-      const webchat = document.querySelector('.bpWebchat');
-      const container = document.getElementById('chatArea');
-      
-      if (webchat && container && webchat.parentElement !== container) {
-        container.appendChild(webchat);
-        console.log('[Alo] Webchat moved to container');
-      }
-
-      const fab = document.querySelector('.bpFab');
-      if (fab) fab.style.display = 'none';
-    }
-
-    // =========================================
-    // BOTPRESS INITIALIZATION
-    // =========================================
-    function initBotpress() {
-      initAttempts++;
-      console.log(`[Alo] Init attempt ${initAttempts}/${MAX_ATTEMPTS}`);
-
-      if (typeof window.botpress === 'undefined') {
-        console.error('[Alo] Botpress script not loaded');
-        if (initAttempts < MAX_ATTEMPTS) {
-          setTimeout(initBotpress, 500);
-        } else {
-          showError('Failed to load chat service. Please refresh.');
-        }
-        return;
-      }
-
-      // Set up event listeners BEFORE init
-      window.botpress.on('webchat:ready', () => {
-        console.log('[Alo] Webchat ready event fired');
-        setStatus('', 'Online');
-        hideLoading();
-        window.botpress.open();
-        setTimeout(moveWebchatToContainer, 100);
-        setTimeout(moveWebchatToContainer, 500); // Backup
-      });
-
-      window.botpress.on('webchat:opened', () => {
-        console.log('[Alo] Webchat opened');
-        moveWebchatToContainer();
-      });
-
-      window.botpress.on('error', (err) => {
-        console.error('[Alo] Botpress error:', err);
-        showError('Chat error: ' + (err.message || 'Unknown'));
-      });
-
-      // Initialize using configUrl (like the working shareable link)
-      console.log('[Alo] Calling botpress.init with configUrl');
-      
-      window.botpress.init({
-        configUrl: CONFIG_URL,
-        // Override some settings
-        configuration: {
-          composerPlaceholder: "Share what's on your mind...",
-          botName: 'Alo',
-          botDescription: 'Your therapeutic companion'
-        }
-      });
-
-      // Fallback: if ready event doesn't fire in 10s, try opening anyway
-      setTimeout(() => {
-        const overlay = document.getElementById('loadingOverlay');
-        if (!overlay.classList.contains('hidden')) {
-          console.log('[Alo] Ready event timeout - trying to open anyway');
-          try {
-            window.botpress.open();
-            hideLoading();
-            setStatus('loading', 'Connecting...');
-            setTimeout(moveWebchatToContainer, 100);
-          } catch (e) {
-            showError('Connection timeout. Please refresh.');
-          }
-        }
-      }, 10000);
-    }
-
-    // =========================================
-    // ACTIONS
-    // =========================================
     function newChat() {
-      // For now, simple reload - we'll improve this later
       if (confirm('Start a new conversation?')) {
-        // Clear any Botpress storage
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('bp-') || key.startsWith('botpress')) {
-            localStorage.removeItem(key);
-          }
-        });
-        window.location.reload();
+        // Reload the iframe to reset
+        const frame = document.getElementById('chatFrame');
+        frame.src = frame.src;
       }
-    }
-
-    // =========================================
-    // STARTUP
-    // =========================================
-    console.log('[Alo] Page loaded - v1.0.0 | 2025-12-28 | test-v3.5');
-    
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => setTimeout(initBotpress, 100));
-    } else {
-      setTimeout(initBotpress, 100);
     }
   </script>
 </body>
