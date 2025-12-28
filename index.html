@@ -356,12 +356,22 @@
       display: flex;
       flex-direction: column;
       position: relative;
+      min-height: 500px;
     }
 
-    /* Botpress will inject here */
+    /* Botpress container must have explicit height */
     #bp-webchat-container {
       flex: 1;
-      min-height: 400px;
+      min-height: 500px;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Force botpress iframe to fill container */
+    #bp-webchat-container iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 500px !important;
     }
 
     /* Loading */
@@ -394,7 +404,7 @@
     <nav class="nav-tabs" id="navTabs">
       <button class="nav-tab active" data-tab="chat">Talk with Alo</button>
       <button class="nav-tab" data-tab="homework">Homework</button>
-      <button class="nav-tab" data-tab="notes">Session Notes</button>
+      <button class="nav-tab" data-tab="notes">Notes for Therapist</button>
     </nav>
   </header>
 
@@ -444,9 +454,9 @@
     <!-- Notes Panel -->
     <div class="panel" id="notesPanel">
       <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; padding: 2rem;">
-        <h2 class="section-title">Notes for Your Next Session</h2>
+        <h2 class="section-title">Notes for My Therapist</h2>
         <p style="color: var(--stone); font-size: 0.875rem; margin-bottom: 1.5rem;">
-          Jot down anything you want to bring up with your therapist.
+          Jot down anything you want to share with your therapist. They'll see this in their dashboard before your next session.
         </p>
         <div class="notes-container">
           <textarea 
@@ -454,12 +464,23 @@
             id="checkInNotes" 
             placeholder="What's been on your mind? What would you like to talk about next session?"
           ></textarea>
-          <p class="notes-hint">✨ These notes are just for you. Only you decide what to share.</p>
-          <div class="notes-saved" id="notesSaved">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            Saved
+          <p class="notes-hint">💬 Your therapist will see these notes in their dashboard.</p>
+          <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+            <button id="sendNotesBtn" onclick="sendNotes()" style="padding: 0.5rem 1rem; background: var(--sage); color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">Send to Therapist</button>
+            <div class="notes-saved" id="notesSaved">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Sent!
+            </div>
+          </div>
+        </div>
+        
+        <!-- Previous messages -->
+        <div style="margin-top: 2rem;">
+          <h3 style="font-size: 0.875rem; color: var(--stone); margin-bottom: 1rem;">Previously Sent</h3>
+          <div id="sentMessagesList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Messages will load here -->
           </div>
         </div>
       </div>
@@ -467,6 +488,12 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
+      <!-- Client identifier -->
+      <div class="sidebar-section" style="padding: 1rem 1.5rem; background: var(--sage-light);">
+        <p style="font-size: 0.75rem; color: var(--stone); margin-bottom: 0.25rem;">Connected as</p>
+        <p id="sidebarClientCode" style="font-size: 0.875rem; color: var(--sage-hover); font-weight: 500;">—</p>
+      </div>
+      
       <div class="sidebar-section">
         <h3 class="section-title">Your Homework</h3>
         <div class="homework-list" id="sidebarHomework">
@@ -474,19 +501,19 @@
         </div>
       </div>
       <div class="sidebar-section">
-        <h3 class="section-title">Session Notes</h3>
+        <h3 class="section-title">Notes for Therapist</h3>
         <div class="notes-container">
           <textarea 
             class="notes-textarea" 
             id="sidebarNotes" 
-            placeholder="Notes for your next session..."
+            placeholder="Something to share with your therapist..."
           ></textarea>
-          <p class="notes-hint">Only you decide what to share.</p>
+          <button onclick="sendNotes()" style="margin-top: 0.75rem; padding: 0.5rem 1rem; background: var(--sage); color: white; border: none; border-radius: 6px; font-size: 0.75rem; cursor: pointer; width: 100%;">Send to Therapist</button>
           <div class="notes-saved" id="sidebarNotesSaved">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            Saved
+            Sent!
           </div>
         </div>
       </div>
@@ -576,6 +603,7 @@
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
+      document.getElementById('sidebarClientCode').textContent = code;
 
       // Initialize Botpress with user ID
       initBotpress(code);
@@ -603,20 +631,23 @@
           id: userId
         },
         configuration: {
-          variant: 'solid',
+          composerPlaceholder: "Talk to Alo...",
+          botName: "Alo",
           showPoweredBy: false,
-          showOpenToggle: false,
-          containerWidth: '100%',
-          layoutWidth: '100%'
+          showCloseButton: false,
+          closeOnEscape: false,
+          disableAnimations: false
         }
       });
 
       botpressLoaded = true;
       
-      // Open the chat
+      // Open the chat after a short delay
       setTimeout(() => {
-        window.botpress.open();
-      }, 500);
+        if (window.botpress && window.botpress.open) {
+          window.botpress.open();
+        }
+      }, 1000);
     }
 
     function disconnect() {
@@ -672,34 +703,97 @@
     }
 
     // ============================================================
-    // NOTES
+    // NOTES FOR THERAPIST
     // ============================================================
-    function loadNotes() {
+    async function loadNotes() {
+      // Load draft from localStorage
       const localNotes = localStorage.getItem(`aloNotes_${clientCode}`);
       if (localNotes) {
         document.getElementById('checkInNotes').value = localNotes;
         document.getElementById('sidebarNotes').value = localNotes;
       }
+      
+      // Load sent messages
+      await loadSentMessages();
+    }
+    
+    async function loadSentMessages() {
+      try {
+        const { data, error } = await db
+          .from('client_messages')
+          .select('*')
+          .eq('client_code', clientCode)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        renderSentMessages(data || []);
+      } catch (err) {
+        console.error('Error loading messages:', err);
+      }
+    }
+    
+    function renderSentMessages(messages) {
+      const container = document.getElementById('sentMessagesList');
+      if (!messages.length) {
+        container.innerHTML = '<p style="color: var(--stone); font-size: 0.8rem;">No messages sent yet.</p>';
+        return;
+      }
+      
+      container.innerHTML = messages.map(m => `
+        <div style="background: var(--cream); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem;">
+          <p style="font-size: 0.8rem; color: var(--charcoal); margin-bottom: 0.5rem;">${escapeHtml(m.message)}</p>
+          <p style="font-size: 0.7rem; color: var(--stone);">
+            ${new Date(m.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+            ${m.read_by_therapist ? ' · ✓ Seen' : ''}
+          </p>
+        </div>
+      `).join('');
     }
 
     function handleNotesChange(e) {
       const notes = e.target.value;
       localStorage.setItem(`aloNotes_${clientCode}`, notes);
-      
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => {
-        showSavedIndicator('notesSaved');
-      }, 1000);
     }
 
     function handleSidebarNotesChange(e) {
       const notes = e.target.value;
       localStorage.setItem(`aloNotes_${clientCode}`, notes);
+    }
+    
+    async function sendNotes() {
+      const notes = document.getElementById('checkInNotes').value.trim();
+      if (!notes) {
+        alert('Please write something to send.');
+        return;
+      }
       
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => {
+      try {
+        const { error } = await db
+          .from('client_messages')
+          .insert({
+            client_code: clientCode,
+            message: notes
+          });
+        
+        if (error) throw error;
+        
+        // Clear the textarea and localStorage
+        document.getElementById('checkInNotes').value = '';
+        document.getElementById('sidebarNotes').value = '';
+        localStorage.removeItem(`aloNotes_${clientCode}`);
+        
+        // Show sent indicator
+        showSavedIndicator('notesSaved');
         showSavedIndicator('sidebarNotesSaved');
-      }, 1000);
+        
+        // Reload sent messages
+        await loadSentMessages();
+        
+      } catch (err) {
+        console.error('Error sending notes:', err);
+        alert('Error sending message. Please try again.');
+      }
     }
 
     function showSavedIndicator(elementId) {
