@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alo — Your Thinking Partner</title>
   
-  <!-- BUILD: v1.0.1 | 2025-12-28 | iframe-approach -->
+  <!-- BUILD: v1.1.0 | 2025-12-28 | fixed-from-historical -->
   
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
@@ -17,6 +19,7 @@
       --charcoal: #2D2A26;
       --sage: #8B9A7D;
       --sage-light: #E8EDE4;
+      --border: rgba(156, 149, 137, 0.2);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -48,6 +51,7 @@
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
+      z-index: 100;
     }
 
     .status {
@@ -61,6 +65,18 @@
       height: 8px;
       background: #90EE90;
       border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .header-btn {
@@ -75,10 +91,57 @@
 
     .header-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .chat-frame {
+    /* Chat container - THIS IS WHERE BOTPRESS RENDERS */
+    .chat-container {
       flex: 1;
-      border: none;
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Container for Botpress webchat */
+    #bp-webchat-container {
+      flex: 1;
       width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 0.3s;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--sage-light);
+      border-top-color: var(--sage);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      margin-top: 16px;
+      color: var(--stone);
+      font-size: 14px;
     }
 
     .version-stamp {
@@ -89,42 +152,161 @@
       color: var(--stone);
       opacity: 0.5;
     }
+
+    /* =============================================
+       Botpress webchat styling overrides
+       ============================================= */
+    
+    /* Hide the FAB button */
+    .bpFab { display: none !important; }
+    
+    /* Force webchat to fill container */
+    .bpWebchat {
+      position: absolute !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* Hide default Botpress header */
+    .bpHeaderContainer { display: none !important; }
+    
+    /* Custom message styling */
+    .bpMessageBubble[data-direction="incoming"] {
+      background: var(--sage-light) !important;
+      color: var(--charcoal) !important;
+    }
+
+    .bpMessageBubble[data-direction="outgoing"] {
+      background: var(--sage) !important;
+      color: white !important;
+    }
   </style>
 </head>
 <body>
   <div class="page-container">
     <div class="header">
       <div class="status">
-        <div class="status-dot"></div>
+        <div class="status-dot" id="statusDot"></div>
         <span>Connected as: <strong id="clientName">CLIENTNAME-002</strong></span>
       </div>
-      <div>
+      <div class="header-actions">
         <button class="header-btn" onclick="newChat()">New Chat</button>
-        <span>Online</span>
+        <span id="statusText">Online</span>
       </div>
     </div>
 
-    <!-- Use iframe with the KNOWN WORKING shareable URL -->
-    <iframe 
-      id="chatFrame"
-      class="chat-frame"
-      src="https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.json"
-      allow="microphone"
-    ></iframe>
+    <div class="chat-container">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Connecting to Alo...</div>
+      </div>
+      
+      <!-- IMPORTANT: This is where Botpress renders via containerSelector -->
+      <div id="bp-webchat-container"></div>
+    </div>
   </div>
 
-  <div class="version-stamp">v1.0.1 | 2025-12-28 | iframe</div>
+  <div class="version-stamp">v1.1.0 | 2025-12-28 | fixed</div>
 
+  <!-- Botpress Webchat v3.5 (matches working historical versions) -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+  
   <script>
-    console.log('[Alo] Page loaded - v1.0.1 | 2025-12-28 | iframe-approach');
+    // =========================================
+    // CONFIGURATION - Using the CURRENT working config
+    // =========================================
+    const BOTPRESS_CONFIG_URL = 'https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.json';
+    const BOTPRESS_HOST_URL = 'https://cdn.botpress.cloud/webchat/v3.5';
     
+    // Client code (can be made dynamic later)
+    const CLIENT_CODE = 'CLIENTNAME-002';
+
+    // =========================================
+    // STATE
+    // =========================================
+    let botpressLoaded = false;
+
+    // =========================================
+    // INITIALIZATION
+    // =========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[Alo] Page loaded - v1.1.0');
+      document.getElementById('clientName').textContent = CLIENT_CODE;
+      
+      // Small delay to ensure script is ready
+      setTimeout(initBotpress, 200);
+    });
+
+    function initBotpress() {
+      if (typeof window.botpress === 'undefined') {
+        console.error('[Alo] Botpress script not loaded');
+        return;
+      }
+
+      if (botpressLoaded) {
+        console.log('[Alo] Botpress already loaded, opening...');
+        window.botpress.open();
+        return;
+      }
+
+      console.log('[Alo] Initializing Botpress...');
+
+      // THIS IS THE WORKING PATTERN FROM index_12-16
+      window.botpress.init({
+        configUrl: BOTPRESS_CONFIG_URL,
+        hostUrl: BOTPRESS_HOST_URL,
+        containerSelector: '#bp-webchat-container',
+        userData: {
+          id: CLIENT_CODE
+        },
+        configuration: {
+          variant: 'solid',
+          showPoweredBy: false,
+          showOpenToggle: false,
+          containerWidth: '100%',
+          layoutWidth: '100%',
+          composerPlaceholder: "Share what's on your mind..."
+        }
+      });
+
+      botpressLoaded = true;
+      console.log('[Alo] Botpress init called');
+
+      // Open chat after short delay (working pattern)
+      setTimeout(() => {
+        console.log('[Alo] Opening webchat...');
+        window.botpress.open();
+        hideLoading();
+      }, 500);
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
     function newChat() {
       if (confirm('Start a new conversation?')) {
-        // Reload the iframe to reset
-        const frame = document.getElementById('chatFrame');
-        frame.src = frame.src;
+        // Clear Botpress storage
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('bp') || key.includes('botpress')) {
+            localStorage.removeItem(key);
+          }
+        });
+        window.location.reload();
       }
     }
+
+    // =========================================
+    // ERROR HANDLING
+    // =========================================
+    window.addEventListener('error', (e) => {
+      console.error('[Alo] Error:', e.message);
+    });
   </script>
 </body>
 </html>
