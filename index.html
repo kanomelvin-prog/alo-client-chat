@@ -207,6 +207,7 @@
       flex-direction: column;
       background: var(--cream);
       position: relative;
+      min-height: 400px;
     }
 
     /* Override Botpress default styles to match Alo theme */
@@ -325,9 +326,6 @@
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Botpress Webchat - Using inject.js for proper styling control -->
-  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
 
   <script>
     // ============================================================
@@ -346,6 +344,42 @@
     let clientCode = localStorage.getItem('aloClientCode') || null;
     let db = null;
     let webchatInitialized = false;
+    let botpressLoaded = false;
+
+    // ============================================================
+    // BOTPRESS LOADER - ensures script is ready before calling init
+    // ============================================================
+    function loadBotpressInject(callback) {
+      // Already loaded and ready
+      if (window.botpressWebChat?.init) {
+        botpressLoaded = true;
+        return callback();
+      }
+
+      // Script exists but still loading
+      const existing = document.querySelector('script[data-bp="inject"]');
+      if (existing) {
+        existing.addEventListener('load', () => {
+          botpressLoaded = true;
+          callback();
+        });
+        return;
+      }
+
+      // Load the script
+      const script = document.createElement('script');
+      script.src = 'https://cdn.botpress.cloud/webchat/v2.2/inject.js';
+      script.async = true;
+      script.dataset.bp = 'inject';
+      script.onload = () => {
+        botpressLoaded = true;
+        callback();
+      };
+      script.onerror = () => {
+        console.error('Failed to load Botpress webchat script');
+      };
+      document.head.appendChild(script);
+    }
 
     // ============================================================
     // INITIALIZATION
@@ -390,9 +424,13 @@
       
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
-      document.getElementById('connectedCode').textContent = clientCode; // Fixed: show normalized code
+      document.getElementById('connectedCode').textContent = clientCode;
       
-      initWebchat(clientCode);
+      // Load Botpress first, THEN initialize webchat
+      loadBotpressInject(() => {
+        initWebchat(clientCode);
+      });
+      
       loadHomework();
       loadSentMessages();
     }
@@ -402,19 +440,27 @@
       const container = document.getElementById('bp-webchat-container');
       container.innerHTML = '';
       
+      if (!window.botpressWebChat?.init) {
+        console.error('Botpress webchat not loaded');
+        container.innerHTML = '<p style="padding: 2rem; color: var(--stone); text-align: center;">Chat loading failed. Please refresh the page.</p>';
+        return;
+      }
+      
       // Initialize Botpress webchat with theme matching Alo
+      // Note: container goes INSIDE the config object, not as second argument
       window.botpressWebChat.init({
         botId: BOTPRESS_BOT_ID,
         clientId: BOTPRESS_CLIENT_ID,
         hostUrl: 'https://cdn.botpress.cloud/webchat/v2.2',
         messagingUrl: 'https://messaging.botpress.cloud',
         
+        // Container - MUST be inside config, not second argument
+        container: '#bp-webchat-container',
+        
         // User identification
         userId: userId,
         
-        // Container mode - renders inside our div, not as floating widget
-        containerWidth: '100%',
-        layoutWidth: '100%',
+        // Layout options
         hideWidget: true,
         showCloseButton: false,
         disableAnimations: false,
@@ -423,17 +469,16 @@
         
         // Theme customization to match Alo
         themeName: 'prism',
-        themeColor: '#8B9A7D',  // Sage
+        themeColor: '#8B9A7D',
         
         // Placeholder text
         composerPlaceholder: 'Type your message...',
         botConversationDescription: 'Your thinking partner between sessions',
-        
-      }, '#bp-webchat-container');
+      });
 
       // Auto-show the chat after init
       setTimeout(() => {
-        if (window.botpressWebChat) {
+        if (window.botpressWebChat?.sendEvent) {
           window.botpressWebChat.sendEvent({ type: 'show' });
         }
       }, 500);
@@ -442,13 +487,12 @@
     }
 
     function startNewChat() {
-      if (window.botpressWebChat) {
-        // Try to reset conversation
+      if (window.botpressWebChat?.sendEvent) {
         window.botpressWebChat.sendEvent({ type: 'resetConversation' });
       }
       // Reinitialize as backup
       setTimeout(() => {
-        initWebchat(clientCode);
+        loadBotpressInject(() => initWebchat(clientCode));
       }, 300);
     }
 
