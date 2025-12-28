@@ -340,8 +340,9 @@
     }
 
     function connectClient(code) {
-      clientCode = code;
-      localStorage.setItem('aloClientCode', code);
+      // Normalize to uppercase to match dashboard
+      clientCode = code.trim().toUpperCase();
+      localStorage.setItem('aloClientCode', clientCode);
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
@@ -359,11 +360,11 @@
     }
 
     function startNewChat() {
-      // Reload iframe to start fresh conversation
+      // Reload iframe with cache-buster to force new conversation
       const frame = document.getElementById('chatFrame');
       frame.src = '';
       setTimeout(() => {
-        frame.src = BOTPRESS_SHAREABLE_URL;
+        frame.src = BOTPRESS_SHAREABLE_URL + '&t=' + Date.now();
       }, 100);
     }
 
