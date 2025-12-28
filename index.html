@@ -429,12 +429,11 @@
       // Initialize Supabase
       db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-      // Check for saved client code - show it but DON'T auto-connect
-      // This lets user verify the code is correct before connecting
+      // Check for saved client code and auto-connect
       const saved = localStorage.getItem('aloClientCode');
       if (saved) {
         document.getElementById('clientCodeInput').value = saved;
-        // Don't auto-connect - let user click Connect to verify
+        connect();
       }
 
       // Enter key to connect
@@ -457,15 +456,12 @@
         console.log('Webchat ready');
         botpressReady = true;
         
-        // If user is already connected (e.g., they connected while botpress was loading)
-        // then open the chat now
+        // Only show chat if already connected
         if (clientCode) {
-          console.log('Client already connected, opening chat');
           document.getElementById('loadingOverlay').classList.add('hidden');
           window.botpress.open();
           setTimeout(moveWebchatToContainer, 100);
         }
-        // Otherwise, wait for user to click Connect
       });
 
       window.botpress.on('webchat:opened', () => {
@@ -506,10 +502,10 @@
       const input = document.getElementById('clientCodeInput').value.trim();
       if (!input) return;
 
-      // Preserve original case - must match exactly what's in Supabase
+      // FIXED: Preserve original case (don't force uppercase)
+      // Must match exactly what's in Supabase
       clientCode = input;
       localStorage.setItem('aloClientCode', clientCode);
-      console.log('Connecting as:', clientCode, 'botpressReady:', botpressReady);
 
       // Update UI
       document.getElementById('loginOverlay').classList.add('hidden');
@@ -528,12 +524,9 @@
 
       // Show chat if botpress ready
       if (botpressReady) {
-        console.log('Botpress ready, opening...');
         document.getElementById('loadingOverlay').classList.add('hidden');
         window.botpress.open();
-        setTimeout(moveWebchatToContainer, 200);
-      } else {
-        console.log('Waiting for botpress to be ready...');
+        setTimeout(moveWebchatToContainer, 100);
       }
     }
 
@@ -563,24 +556,21 @@
       }
     }
 
+    // FIXED: New Chat now properly reloads page to get fresh conversation
     function newConversation() {
-      // Clear Botpress conversation data and reload for fresh start
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('bp_') || key.includes('botpress') || key.includes('webchat')) {
+      // Clear Botpress storage to force new conversation
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('bp') || key.includes('botpress') || key.includes('webchat')) {
           localStorage.removeItem(key);
         }
       });
-      // Keep the client code but reload for fresh Botpress conversation
+      // Reload page - will auto-reconnect with saved client code
       window.location.reload();
     }
 
     // ==================== HOMEWORK ====================
     async function loadHomework() {
-      if (!clientCode || !db) {
-        console.log('Cannot load homework: no client code or db');
-        return;
-      }
+      if (!clientCode || !db) return;
 
       console.log('Loading homework for:', clientCode);
 
@@ -593,12 +583,12 @@
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Homework query error:', error);
+          console.error('Homework error:', error);
           renderHomework([]);
           return;
         }
 
-        console.log('Homework loaded:', data?.length || 0, 'items', data);
+        console.log('Homework loaded:', data?.length || 0, 'items');
         renderHomework(data || []);
       } catch (e) {
         console.error('Homework exception:', e);
@@ -632,64 +622,27 @@
       const textarea = document.getElementById('notesTextarea');
       const text = textarea.value.trim();
       
-      if (!text) {
-        alert('Please enter a message');
-        return;
-      }
-
-      if (!clientCode) {
-        alert('Not connected - please reconnect');
-        return;
-      }
-
-      if (!db) {
-        alert('Database not initialized');
-        return;
-      }
+      if (!text || !clientCode || !db) return;
 
       const btn = document.getElementById('sendBtn');
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
-      console.log('Sending note for client:', clientCode);
-      console.log('Message:', text);
-
       try {
-        const { data, error } = await db
+        const { error } = await db
           .from('client_messages')
           .insert({
             client_code: clientCode,
             message: text
-          })
-          .select();
+          });
 
         if (error) {
           console.error('Send note error:', error);
-          
-          // Check if table doesn't exist
-          if (error.message?.includes('relation') || error.code === '42P01') {
-            alert('The client_messages table needs to be created in Supabase. Check the console for the SQL.');
-            console.log(`
-CREATE TABLE client_messages (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  client_code TEXT NOT NULL,
-  message TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE client_messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all" ON client_messages FOR ALL USING (true);
-            `);
-          } else {
-            alert('Failed to send: ' + error.message);
-          }
-          
+          alert('Failed to send. Please try again.');
           btn.disabled = false;
           btn.textContent = 'Send to Therapist';
           return;
         }
-
-        console.log('Note sent successfully:', data);
 
         // Success
         textarea.value = '';
@@ -702,7 +655,7 @@ CREATE POLICY "Allow all" ON client_messages FOR ALL USING (true);
 
       } catch (e) {
         console.error('Send note exception:', e);
-        alert('Failed to send: ' + e.message);
+        alert('Failed to send. Please try again.');
         btn.disabled = false;
         btn.textContent = 'Send to Therapist';
       }
