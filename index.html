@@ -183,18 +183,6 @@
     }
     .disconnect-btn:hover { background: var(--sage); color: white; }
 
-    .chat-frame {
-      flex: 1;
-      border: none;
-      width: 100%;
-      background: white;
-    }
-
-    .panel { display: none; }
-    .panel.active { display: flex; flex-direction: column; flex: 1; }
-    .main.chat-only { grid-template-columns: 1fr; }
-    .main.chat-only .sidebar { display: none; }
-
     .new-chat-btn {
       padding: 0.4rem 0.75rem;
       background: var(--cream);
@@ -206,6 +194,62 @@
       margin-left: 0.5rem;
     }
     .new-chat-btn:hover { background: var(--border); }
+
+    .panel { display: none; }
+    .panel.active { display: flex; flex-direction: column; flex: 1; }
+    .main.chat-only { grid-template-columns: 1fr; }
+    .main.chat-only .sidebar { display: none; }
+
+    /* Botpress container - fills remaining space */
+    #bp-webchat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--cream);
+      position: relative;
+    }
+
+    /* Override Botpress default styles to match Alo theme */
+    #bp-webchat-container .bpw-layout {
+      background: var(--cream) !important;
+      font-family: 'DM Sans', sans-serif !important;
+    }
+
+    #bp-webchat-container .bpw-header-container {
+      background: var(--sage) !important;
+    }
+
+    #bp-webchat-container .bpw-bot-avatar {
+      background: var(--sage) !important;
+    }
+
+    #bp-webchat-container .bpw-from-bot .bpw-chat-bubble {
+      background: var(--warm-white) !important;
+      color: var(--charcoal) !important;
+      border: 1px solid var(--border) !important;
+    }
+
+    #bp-webchat-container .bpw-from-user .bpw-chat-bubble {
+      background: var(--sage) !important;
+      color: white !important;
+    }
+
+    #bp-webchat-container .bpw-composer {
+      background: var(--warm-white) !important;
+      border-top: 1px solid var(--border) !important;
+    }
+
+    #bp-webchat-container .bpw-composer textarea {
+      font-family: 'DM Sans', sans-serif !important;
+    }
+
+    #bp-webchat-container .bpw-send-button {
+      background: var(--sage) !important;
+    }
+
+    #bp-webchat-container .bpw-send-button:hover {
+      background: var(--sage-hover) !important;
+    }
   </style>
 </head>
 <body>
@@ -238,12 +282,7 @@
               <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
             </div>
           </div>
-          <iframe 
-            id="chatFrame"
-            class="chat-frame"
-            src=""
-            allow="microphone"
-          ></iframe>
+          <div id="bp-webchat-container"></div>
         </div>
       </div>
     </div>
@@ -286,6 +325,9 @@
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Botpress Webchat - Using inject.js for proper styling control -->
+  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
 
   <script>
     // ============================================================
@@ -294,14 +336,16 @@
     const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
     
-    // Botpress shareable URL - update this when you republish
-    const BOTPRESS_SHAREABLE_URL = 'https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.json';
+    // Botpress configuration - from your bot export
+    const BOTPRESS_BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const BOTPRESS_CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
 
     // ============================================================
     // STATE
     // ============================================================
     let clientCode = localStorage.getItem('aloClientCode') || null;
     let db = null;
+    let webchatInitialized = false;
 
     // ============================================================
     // INITIALIZATION
@@ -343,29 +387,69 @@
       // Normalize to uppercase to match dashboard
       clientCode = code.trim().toUpperCase();
       localStorage.setItem('aloClientCode', clientCode);
+      
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
-      document.getElementById('connectedCode').textContent = code;
+      document.getElementById('connectedCode').textContent = clientCode; // Fixed: show normalized code
       
-      // Load the chat iframe
-      loadChat();
+      initWebchat(clientCode);
       loadHomework();
       loadSentMessages();
     }
 
-    function loadChat() {
-      // Add timestamp to force fresh conversation
-      const chatUrl = BOTPRESS_SHAREABLE_URL;
-      document.getElementById('chatFrame').src = chatUrl;
+    function initWebchat(userId) {
+      // Clear any existing webchat
+      const container = document.getElementById('bp-webchat-container');
+      container.innerHTML = '';
+      
+      // Initialize Botpress webchat with theme matching Alo
+      window.botpressWebChat.init({
+        botId: BOTPRESS_BOT_ID,
+        clientId: BOTPRESS_CLIENT_ID,
+        hostUrl: 'https://cdn.botpress.cloud/webchat/v2.2',
+        messagingUrl: 'https://messaging.botpress.cloud',
+        
+        // User identification
+        userId: userId,
+        
+        // Container mode - renders inside our div, not as floating widget
+        containerWidth: '100%',
+        layoutWidth: '100%',
+        hideWidget: true,
+        showCloseButton: false,
+        disableAnimations: false,
+        enableConversationDeletion: true,
+        showPoweredBy: false,
+        
+        // Theme customization to match Alo
+        themeName: 'prism',
+        themeColor: '#8B9A7D',  // Sage
+        
+        // Placeholder text
+        composerPlaceholder: 'Type your message...',
+        botConversationDescription: 'Your thinking partner between sessions',
+        
+      }, '#bp-webchat-container');
+
+      // Auto-show the chat after init
+      setTimeout(() => {
+        if (window.botpressWebChat) {
+          window.botpressWebChat.sendEvent({ type: 'show' });
+        }
+      }, 500);
+      
+      webchatInitialized = true;
     }
 
     function startNewChat() {
-      // Reload iframe with cache-buster to force new conversation
-      const frame = document.getElementById('chatFrame');
-      frame.src = '';
+      if (window.botpressWebChat) {
+        // Try to reset conversation
+        window.botpressWebChat.sendEvent({ type: 'resetConversation' });
+      }
+      // Reinitialize as backup
       setTimeout(() => {
-        frame.src = BOTPRESS_SHAREABLE_URL + '&t=' + Date.now();
-      }, 100);
+        initWebchat(clientCode);
+      }, 300);
     }
 
     function disconnect() {
@@ -374,7 +458,11 @@
       document.getElementById('welcomeView').style.display = 'flex';
       document.getElementById('connectedView').style.display = 'none';
       document.getElementById('clientCodeInput').value = '';
-      document.getElementById('chatFrame').src = '';
+      
+      // Clear webchat
+      const container = document.getElementById('bp-webchat-container');
+      container.innerHTML = '';
+      webchatInitialized = false;
     }
 
     // ============================================================
