@@ -457,12 +457,15 @@
         console.log('Webchat ready');
         botpressReady = true;
         
-        // Only show chat if already connected
+        // If user is already connected (e.g., they connected while botpress was loading)
+        // then open the chat now
         if (clientCode) {
+          console.log('Client already connected, opening chat');
           document.getElementById('loadingOverlay').classList.add('hidden');
           window.botpress.open();
           setTimeout(moveWebchatToContainer, 100);
         }
+        // Otherwise, wait for user to click Connect
       });
 
       window.botpress.on('webchat:opened', () => {
@@ -506,6 +509,7 @@
       // Preserve original case - must match exactly what's in Supabase
       clientCode = input;
       localStorage.setItem('aloClientCode', clientCode);
+      console.log('Connecting as:', clientCode, 'botpressReady:', botpressReady);
 
       // Update UI
       document.getElementById('loginOverlay').classList.add('hidden');
@@ -524,9 +528,12 @@
 
       // Show chat if botpress ready
       if (botpressReady) {
+        console.log('Botpress ready, opening...');
         document.getElementById('loadingOverlay').classList.add('hidden');
         window.botpress.open();
-        setTimeout(moveWebchatToContainer, 100);
+        setTimeout(moveWebchatToContainer, 200);
+      } else {
+        console.log('Waiting for botpress to be ready...');
       }
     }
 
