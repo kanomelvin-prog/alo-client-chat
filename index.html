@@ -610,23 +610,44 @@
     function initBotpress(userId) {
       // Initialize Botpress but don't open yet
       if (!botpressLoaded) {
-        window.botpress.init({
-          configUrl: BOTPRESS_CONFIG_URL,
-          hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
-          userData: {
-            id: userId
-          }
-        });
-        botpressLoaded = true;
+        try {
+          window.botpress.init({
+            configUrl: BOTPRESS_CONFIG_URL,
+            hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
+            userData: {
+              id: userId
+            }
+          });
+          botpressLoaded = true;
+          console.log('Botpress initialized for user:', userId);
+        } catch (err) {
+          console.error('Error initializing Botpress:', err);
+        }
       } else {
         // Update user if already loaded
-        window.botpress.updateUser({ id: userId });
+        try {
+          window.botpress.updateUser({ id: userId });
+          console.log('Botpress user updated:', userId);
+        } catch (err) {
+          console.error('Error updating Botpress user:', err);
+        }
       }
     }
     
     function openAloChat() {
-      if (window.botpress && window.botpress.open) {
-        window.botpress.open();
+      console.log('Opening Alo chat...');
+      if (window.botpress) {
+        if (window.botpress.open) {
+          window.botpress.open();
+        } else if (window.botpress.toggle) {
+          window.botpress.toggle();
+        } else {
+          console.error('Botpress open/toggle not available');
+          alert('Chat is loading, please try again in a moment.');
+        }
+      } else {
+        console.error('Botpress not loaded');
+        alert('Chat is not available. Please refresh the page.');
       }
     }
 
