@@ -429,12 +429,12 @@
       // Initialize Supabase
       db = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-      // Check for saved client code
+      // Check for saved client code - show it but DON'T auto-connect
+      // This lets user verify the code is correct before connecting
       const saved = localStorage.getItem('aloClientCode');
       if (saved) {
         document.getElementById('clientCodeInput').value = saved;
-        // Auto-connect if previously connected
-        connect();
+        // Don't auto-connect - let user click Connect to verify
       }
 
       // Enter key to connect
@@ -557,22 +557,15 @@
     }
 
     function newConversation() {
-      if (window.botpress) {
-        // For Botpress v3.3, the best way to "reset" is to send a special message
-        // or simply reload the page to get a fresh conversation
-        if (confirm('Start a new conversation? This will refresh the page.')) {
-          // Clear local storage for botpress
-          const keys = Object.keys(localStorage);
-          keys.forEach(key => {
-            if (key.startsWith('bp_') || key.includes('botpress') || key.includes('webchat')) {
-              localStorage.removeItem(key);
-            }
-          });
-          
-          // Reload page to get fresh Botpress instance
-          window.location.reload();
+      // Clear Botpress conversation data and reload for fresh start
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('bp_') || key.includes('botpress') || key.includes('webchat')) {
+          localStorage.removeItem(key);
         }
-      }
+      });
+      // Keep the client code but reload for fresh Botpress conversation
+      window.location.reload();
     }
 
     // ==================== HOMEWORK ====================
