@@ -356,12 +356,22 @@
       display: flex;
       flex-direction: column;
       position: relative;
+      min-height: 500px;
     }
 
-    /* Botpress will inject here */
+    /* Botpress container must have explicit height */
     #bp-webchat-container {
       flex: 1;
-      min-height: 400px;
+      min-height: 500px;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Force botpress iframe to fill container */
+    #bp-webchat-container iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 500px !important;
     }
 
     /* Loading */
@@ -478,6 +488,12 @@
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
+      <!-- Client identifier -->
+      <div class="sidebar-section" style="padding: 1rem 1.5rem; background: var(--sage-light);">
+        <p style="font-size: 0.75rem; color: var(--stone); margin-bottom: 0.25rem;">Connected as</p>
+        <p id="sidebarClientCode" style="font-size: 0.875rem; color: var(--sage-hover); font-weight: 500;">—</p>
+      </div>
+      
       <div class="sidebar-section">
         <h3 class="section-title">Your Homework</h3>
         <div class="homework-list" id="sidebarHomework">
@@ -587,6 +603,7 @@
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
+      document.getElementById('sidebarClientCode').textContent = code;
 
       // Initialize Botpress with user ID
       initBotpress(code);
@@ -614,20 +631,23 @@
           id: userId
         },
         configuration: {
-          variant: 'solid',
+          composerPlaceholder: "Talk to Alo...",
+          botName: "Alo",
           showPoweredBy: false,
-          showOpenToggle: false,
-          containerWidth: '100%',
-          layoutWidth: '100%'
+          showCloseButton: false,
+          closeOnEscape: false,
+          disableAnimations: false
         }
       });
 
       botpressLoaded = true;
       
-      // Open the chat
+      // Open the chat after a short delay
       setTimeout(() => {
-        window.botpress.open();
-      }, 500);
+        if (window.botpress && window.botpress.open) {
+          window.botpress.open();
+        }
+      }, 1000);
     }
 
     function disconnect() {
