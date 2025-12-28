@@ -187,12 +187,25 @@
       flex: 1;
       border: none;
       width: 100%;
+      background: white;
     }
 
     .panel { display: none; }
     .panel.active { display: flex; flex-direction: column; flex: 1; }
     .main.chat-only { grid-template-columns: 1fr; }
     .main.chat-only .sidebar { display: none; }
+
+    .new-chat-btn {
+      padding: 0.4rem 0.75rem;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      color: var(--charcoal);
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    .new-chat-btn:hover { background: var(--border); }
   </style>
 </head>
 <body>
@@ -220,12 +233,16 @@
         <div id="connectedView" style="display: none; flex: 1; flex-direction: column;">
           <div class="connected-header">
             <span class="connected-info">Connected as: <strong id="connectedCode"></strong></span>
-            <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
+            <div>
+              <button class="new-chat-btn" onclick="startNewChat()">New Chat</button>
+              <button class="disconnect-btn" onclick="disconnect()">Disconnect</button>
+            </div>
           </div>
           <iframe 
             id="chatFrame"
             class="chat-frame"
-            src="https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json"
+            src=""
+            allow="microphone"
           ></iframe>
         </div>
       </div>
@@ -267,18 +284,34 @@
     </aside>
   </main>
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
     const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
+    
+    // Botpress shareable URL - update this when you republish
+    const BOTPRESS_SHAREABLE_URL = 'https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json';
 
+    // ============================================================
+    // STATE
+    // ============================================================
     let clientCode = localStorage.getItem('aloClientCode') || null;
     let db = null;
 
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
       db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       
-      if (clientCode) connectClient(clientCode);
+      if (clientCode) {
+        connectClient(clientCode);
+      }
 
       document.getElementById('connectBtn').addEventListener('click', handleConnect);
       document.getElementById('clientCodeInput').addEventListener('keypress', e => {
@@ -289,7 +322,7 @@
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
       });
 
-      // Sync notes
+      // Sync notes between panel and sidebar
       document.getElementById('notesTextarea').addEventListener('input', e => {
         document.getElementById('sidebarNotes').value = e.target.value;
       });
@@ -298,6 +331,9 @@
       });
     });
 
+    // ============================================================
+    // CLIENT CONNECTION
+    // ============================================================
     function handleConnect() {
       const code = document.getElementById('clientCodeInput').value.trim();
       if (code) connectClient(code);
@@ -309,8 +345,26 @@
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
+      
+      // Load the chat iframe
+      loadChat();
       loadHomework();
       loadSentMessages();
+    }
+
+    function loadChat() {
+      // Add timestamp to force fresh conversation
+      const chatUrl = BOTPRESS_SHAREABLE_URL;
+      document.getElementById('chatFrame').src = chatUrl;
+    }
+
+    function startNewChat() {
+      // Reload iframe to start fresh conversation
+      const frame = document.getElementById('chatFrame');
+      frame.src = '';
+      setTimeout(() => {
+        frame.src = BOTPRESS_SHAREABLE_URL;
+      }, 100);
     }
 
     function disconnect() {
@@ -319,23 +373,33 @@
       document.getElementById('welcomeView').style.display = 'flex';
       document.getElementById('connectedView').style.display = 'none';
       document.getElementById('clientCodeInput').value = '';
+      document.getElementById('chatFrame').src = '';
     }
 
+    // ============================================================
+    // HOMEWORK
+    // ============================================================
     async function loadHomework() {
       try {
         const { data } = await db.from('homework').select('*').eq('client_code', clientCode).eq('active', true);
         renderHomework(data || []);
-      } catch (e) { renderHomework([]); }
+      } catch (e) { 
+        console.error('Error loading homework:', e);
+        renderHomework([]); 
+      }
     }
 
     function renderHomework(items) {
       const html = items.length === 0 
         ? '<div class="homework-empty">No homework right now.<br>Check back after your next session.</div>'
-        : items.map(i => `<div class="homework-card"><div class="homework-type">${i.homework_type}</div><div class="homework-description">${i.description}</div></div>`).join('');
+        : items.map(i => `<div class="homework-card"><div class="homework-type">${escapeHtml(i.homework_type)}</div><div class="homework-description">${escapeHtml(i.description)}</div></div>`).join('');
       document.getElementById('homeworkList').innerHTML = html;
       document.getElementById('sidebarHomework').innerHTML = html;
     }
 
+    // ============================================================
+    // NOTES TO THERAPIST
+    // ============================================================
     async function sendNote() {
       const text = document.getElementById('notesTextarea').value.trim();
       if (!text || !clientCode) return;
@@ -346,20 +410,40 @@
         document.getElementById('sidebarNotes').value = '';
         alert('Sent to therapist!');
         loadSentMessages();
-      } catch (e) { alert('Error sending'); }
+      } catch (e) { 
+        console.error('Error sending note:', e);
+        alert('Error sending'); 
+      }
     }
 
     async function loadSentMessages() {
       if (!clientCode) return;
       try {
-        const { data } = await db.from('client_messages').select('*').eq('client_code', clientCode).order('created_at', { ascending: false }).limit(5);
+        const { data } = await db
+          .from('client_messages')
+          .select('*')
+          .eq('client_code', clientCode)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
         if (data?.length) {
-          document.getElementById('sentMessages').innerHTML = '<p style="font-size:0.8rem;color:var(--stone);margin-bottom:0.5rem;">Previously sent:</p>' + 
-            data.map(m => `<div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:0.75rem;margin-bottom:0.5rem;font-size:0.85rem;">${m.message}<br><small style="color:var(--stone);">${new Date(m.created_at).toLocaleDateString()}</small></div>`).join('');
+          document.getElementById('sentMessages').innerHTML = 
+            '<p style="font-size:0.8rem;color:var(--stone);margin-bottom:0.5rem;">Previously sent:</p>' + 
+            data.map(m => `
+              <div style="background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:0.75rem;margin-bottom:0.5rem;font-size:0.85rem;">
+                ${escapeHtml(m.message)}
+                <br><small style="color:var(--stone);">${new Date(m.created_at).toLocaleDateString()}</small>
+              </div>
+            `).join('');
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('Error loading sent messages:', e);
+      }
     }
 
+    // ============================================================
+    // TAB NAVIGATION
+    // ============================================================
     function switchTab(tabName) {
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -371,6 +455,16 @@
       } else {
         main.classList.add('chat-only');
       }
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
   </script>
 </body>
