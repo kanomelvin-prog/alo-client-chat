@@ -503,8 +503,8 @@
       const input = document.getElementById('clientCodeInput').value.trim();
       if (!input) return;
 
-      // Normalize to uppercase
-      clientCode = input.toUpperCase();
+      // Preserve original case - must match exactly what's in Supabase
+      clientCode = input;
       localStorage.setItem('aloClientCode', clientCode);
 
       // Update UI
@@ -558,38 +558,19 @@
 
     function newConversation() {
       if (window.botpress) {
-        // Reset conversation by destroying and reinitializing
-        try {
-          // Try the official reset method first
-          if (window.botpress.resetConversation) {
-            window.botpress.resetConversation();
-          }
-          
-          // Close and reopen to force refresh
-          window.botpress.close();
-          
-          // Clear any stored conversation in localStorage
+        // For Botpress v3.3, the best way to "reset" is to send a special message
+        // or simply reload the page to get a fresh conversation
+        if (confirm('Start a new conversation? This will refresh the page.')) {
+          // Clear local storage for botpress
           const keys = Object.keys(localStorage);
           keys.forEach(key => {
-            if (key.startsWith('bp_') || key.includes('botpress')) {
+            if (key.startsWith('bp_') || key.includes('botpress') || key.includes('webchat')) {
               localStorage.removeItem(key);
             }
           });
           
-          // Reopen after a short delay
-          setTimeout(() => {
-            window.botpress.open();
-            moveWebchatToContainer();
-          }, 300);
-          
-        } catch (e) {
-          console.error('Error resetting conversation:', e);
-          // Fallback: just close and reopen
-          window.botpress.close();
-          setTimeout(() => {
-            window.botpress.open();
-            moveWebchatToContainer();
-          }, 300);
+          // Reload page to get fresh Botpress instance
+          window.location.reload();
         }
       }
     }
