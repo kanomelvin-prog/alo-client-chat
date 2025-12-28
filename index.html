@@ -272,13 +272,8 @@
     }
 
     function newConversation() {
-      if (window.botpress) {
-        // Try to reset/create new conversation
-        window.botpress.close();
-        setTimeout(() => {
-          window.botpress.open();
-        }, 100);
-      }
+      // Simple reload for now
+      window.location.reload();
     }
 
     // Initialize when ready
