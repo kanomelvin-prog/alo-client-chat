@@ -558,17 +558,50 @@
 
     function newConversation() {
       if (window.botpress) {
-        window.botpress.close();
-        setTimeout(() => {
-          window.botpress.open();
-          moveWebchatToContainer();
-        }, 100);
+        // Reset conversation by destroying and reinitializing
+        try {
+          // Try the official reset method first
+          if (window.botpress.resetConversation) {
+            window.botpress.resetConversation();
+          }
+          
+          // Close and reopen to force refresh
+          window.botpress.close();
+          
+          // Clear any stored conversation in localStorage
+          const keys = Object.keys(localStorage);
+          keys.forEach(key => {
+            if (key.startsWith('bp_') || key.includes('botpress')) {
+              localStorage.removeItem(key);
+            }
+          });
+          
+          // Reopen after a short delay
+          setTimeout(() => {
+            window.botpress.open();
+            moveWebchatToContainer();
+          }, 300);
+          
+        } catch (e) {
+          console.error('Error resetting conversation:', e);
+          // Fallback: just close and reopen
+          window.botpress.close();
+          setTimeout(() => {
+            window.botpress.open();
+            moveWebchatToContainer();
+          }, 300);
+        }
       }
     }
 
     // ==================== HOMEWORK ====================
     async function loadHomework() {
-      if (!clientCode || !db) return;
+      if (!clientCode || !db) {
+        console.log('Cannot load homework: no client code or db');
+        return;
+      }
+
+      console.log('Loading homework for:', clientCode);
 
       try {
         const { data, error } = await db
@@ -579,13 +612,16 @@
           .order('created_at', { ascending: false });
 
         if (error) {
-          console.error('Homework error:', error);
+          console.error('Homework query error:', error);
+          renderHomework([]);
           return;
         }
 
+        console.log('Homework loaded:', data?.length || 0, 'items', data);
         renderHomework(data || []);
       } catch (e) {
         console.error('Homework exception:', e);
+        renderHomework([]);
       }
     }
 
@@ -615,27 +651,64 @@
       const textarea = document.getElementById('notesTextarea');
       const text = textarea.value.trim();
       
-      if (!text || !clientCode || !db) return;
+      if (!text) {
+        alert('Please enter a message');
+        return;
+      }
+
+      if (!clientCode) {
+        alert('Not connected - please reconnect');
+        return;
+      }
+
+      if (!db) {
+        alert('Database not initialized');
+        return;
+      }
 
       const btn = document.getElementById('sendBtn');
       btn.disabled = true;
       btn.textContent = 'Sending...';
 
+      console.log('Sending note for client:', clientCode);
+      console.log('Message:', text);
+
       try {
-        const { error } = await db
+        const { data, error } = await db
           .from('client_messages')
           .insert({
             client_code: clientCode,
             message: text
-          });
+          })
+          .select();
 
         if (error) {
           console.error('Send note error:', error);
-          alert('Failed to send. Please try again.');
+          
+          // Check if table doesn't exist
+          if (error.message?.includes('relation') || error.code === '42P01') {
+            alert('The client_messages table needs to be created in Supabase. Check the console for the SQL.');
+            console.log(`
+CREATE TABLE client_messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  client_code TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE client_messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all" ON client_messages FOR ALL USING (true);
+            `);
+          } else {
+            alert('Failed to send: ' + error.message);
+          }
+          
           btn.disabled = false;
           btn.textContent = 'Send to Therapist';
           return;
         }
+
+        console.log('Note sent successfully:', data);
 
         // Success
         textarea.value = '';
@@ -648,7 +721,7 @@
 
       } catch (e) {
         console.error('Send note exception:', e);
-        alert('Failed to send. Please try again.');
+        alert('Failed to send: ' + e.message);
         btn.disabled = false;
         btn.textContent = 'Send to Therapist';
       }
