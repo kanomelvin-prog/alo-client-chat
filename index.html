@@ -361,18 +361,9 @@
     }
 
     function openChat() {
-      if (window.botpress) {
-        if (window.botpress.open) {
-          window.botpress.open();
-        } else if (window.botpress.toggle) {
-          window.botpress.toggle();
-        } else {
-          // Fallback: open shareable URL
-          window.open(`https://cdn.botpress.cloud/webchat/v2.2/shareable.html?botId=${BOTPRESS_BOT_ID}`, '_blank');
-        }
-      } else {
-        alert('Chat is loading, please try again.');
-      }
+      // Open Botpress shareable page in new tab
+      const shareableUrl = 'https://cdn.botpress.cloud/webchat/v3.5/shareable.html?configUrl=https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json';
+      window.open(shareableUrl, '_blank');
     }
 
     // =====================================================
