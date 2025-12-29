@@ -17,17 +17,15 @@
     :root {
       --cream: #FDFBF7;
       --warm-white: #FAF8F5;
+      --sage: #8B9A7D;
       --stone: #9C9589;
       --charcoal: #2D2A26;
-      --sage: #8B9A7D;
-      --sage-light: #E8EDE4;
     }
 
     body, html {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--cream);
-      color: var(--charcoal);
       height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--cream);
       overflow: hidden;
     }
 
@@ -44,52 +42,22 @@
     .header {
       background: var(--sage);
       color: white;
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 20px 24px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
       font-weight: 500;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
     }
 
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: #90EE90;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .header-btn {
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      color: white;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .header-btn:hover {
-      background: rgba(255,255,255,0.3);
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+      font-weight: 400;
     }
 
     .chat-frame {
@@ -99,86 +67,112 @@
       background: white;
     }
 
-    .loading-overlay {
-      position: absolute;
-      inset: 0;
+    .footer {
       background: var(--warm-white);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
+      border-top: 1px solid rgba(156, 149, 137, 0.15);
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--stone);
     }
 
-    .loading-overlay.hidden {
-      display: none;
+    /* Loading state */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: var(--stone);
     }
 
-    .loading-spinner {
+    .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid var(--sage-light);
+      border: 3px solid rgba(139, 154, 125, 0.2);
       border-top-color: var(--sage);
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    .loading-text {
-      margin-top: 16px;
-      color: var(--stone);
-      font-size: 14px;
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        box-shadow: none;
+      }
+      
+      .header h1 {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <span class="status">Connected as: <strong id="clientName">CLIENTNAME-002</strong></span>
-      <div class="header-actions">
-        <button class="header-btn" onclick="newConversation()">New Chat</button>
-        <span id="connectionStatus">Online</span>
-      </div>
+      <h1>Alo</h1>
+      <p>Your thinking partner between sessions</p>
     </div>
-
-    <div style="position: relative; flex: 1;">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Connecting to Alo...</div>
-      </div>
-      
-      <iframe 
-        id="botpressChat"
-        class="chat-frame"
-        allow="microphone"
-        onload="hideLoading()"
-      ></iframe>
+    
+    <iframe 
+      id="botpress-chat" 
+      class="chat-frame" 
+      allow="microphone"
+      title="Chat with Alo"
+    ></iframe>
+    
+    <div class="footer">
+      <span id="user-id-display"></span>
     </div>
   </div>
 
   <script>
-    // Your Botpress configuration
-    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
-    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
-    
-    // Set iframe source with user ID
-    const iframe = document.getElementById('botpressChat');
-    iframe.src = `https://cdn.botpress.cloud/webchat/v2.2/shareable.html?botId=${BOT_ID}&userId=${CLIENT_ID}`;
-    
-    function hideLoading() {
-      document.getElementById('loadingOverlay').classList.add('hidden');
+    // Configuration
+    const BOTPRESS_BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const BOTPRESS_SHAREABLE_URL = 'https://cdn.botpress.cloud/webchat/v2.2/shareable.html';
+
+    // Generate or retrieve stable user ID
+    function getOrCreateUserId() {
+      let userId = localStorage.getItem('alo_user_id');
+      if (!userId) {
+        // Generate UUID-like ID
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+        localStorage.setItem('alo_user_id', userId);
+        console.log('Created new user ID:', userId);
+      } else {
+        console.log('Retrieved existing user ID:', userId);
+      }
+      return userId;
     }
-    
-    function newConversation() {
-      // Reload to start fresh conversation
-      window.location.reload();
+
+    // Initialize chat
+    function initChat() {
+      const userId = getOrCreateUserId();
+      const iframe = document.getElementById('botpress-chat');
+      
+      // Build Botpress URL with user ID
+      const chatUrl = `${BOTPRESS_SHAREABLE_URL}?botId=${BOTPRESS_BOT_ID}&userId=${encodeURIComponent(userId)}`;
+      
+      // Load the chat
+      iframe.src = chatUrl;
+      
+      // Display user ID in footer (optional - can remove for production)
+      const displayId = userId.length > 20 ? userId.substring(0, 20) + '...' : userId;
+      document.getElementById('user-id-display').textContent = `Session ID: ${displayId}`;
     }
-    
-    // Update client name if needed
-    document.getElementById('clientName').textContent = CLIENT_ID;
+
+    // Start when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initChat);
+    } else {
+      initChat();
+    }
   </script>
 </body>
 </html>
