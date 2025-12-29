@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Alo - Milestone 1 (Working)</title>
+  <title>Chat with Alo - Milestone 1 (Fixed)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,23 +49,61 @@
       background: #ffebee;
       border-left-color: #f44336;
     }
+    
+    .open-chat-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 15px 30px;
+      background: #8B9A7D;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .open-chat-btn:hover {
+      background: #7a8a6d;
+    }
+    
+    .open-chat-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    /* Force Botpress button to be visible */
+    .bpFab {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 20px !important;
+      z-index: 999999 !important;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Talk to Alo</h1>
-    <p>Click the button in the bottom-right corner to start chatting with your AI thinking partner.</p>
+    <p>Click the button below (or look for the floating button in the corner) to start chatting with your AI thinking partner.</p>
     <p style="font-size: 14px; color: #999; margin-top: 20px;">
       <strong>Note:</strong> This is Milestone 1 - the basic Botpress widget with default styling. 
       Later milestones will add custom design and features.
     </p>
+    
+    <button id="openChatBtn" class="open-chat-btn" disabled onclick="openChat()">
+      💬 Open Chat
+    </button>
     
     <div id="statusBox" class="status loading">
       <strong>Status:</strong> <span id="statusText">Loading Alo...</span>
     </div>
   </div>
   
-  <!-- Botpress v3 Scripts - CORRECTED -->
+  <!-- Botpress v3 Scripts -->
   <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
   <script src="https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.js"></script>
   
@@ -74,17 +112,48 @@
     let checkAttempts = 0;
     const maxAttempts = 50;
     
+    function openChat() {
+      if (window.botpress && window.botpress.open) {
+        window.botpress.open();
+        console.log('📱 Opening chat via API');
+      } else {
+        alert('Chat not ready yet. Please wait a moment and try again.');
+      }
+    }
+    
     const checkBotpress = setInterval(() => {
       checkAttempts++;
       
       if (window.botpress) {
         // Success! Botpress v3 loaded
         clearInterval(checkBotpress);
-        document.getElementById('statusText').textContent = '✅ Alo is ready! Click the chat button in the corner.';
+        document.getElementById('statusText').textContent = '✅ Alo is ready! Click the button to chat.';
         document.getElementById('statusBox').className = 'status';
+        document.getElementById('openChatBtn').disabled = false;
         
         console.log('✅ Botpress v3 loaded successfully');
-        console.log('Bot ID:', 'fc0fad71-daea-4d22-adf5-3a659042d46a');
+        console.log('Available methods:', Object.keys(window.botpress));
+        
+        // Check if button is rendered
+        setTimeout(() => {
+          const fab = document.querySelector('.bpFab');
+          const webchat = document.querySelector('.bpWebchat');
+          
+          console.log('🔍 Debugging info:');
+          console.log('- FAB button found:', !!fab);
+          console.log('- Webchat found:', !!webchat);
+          
+          if (fab) {
+            console.log('- FAB position:', window.getComputedStyle(fab).position);
+            console.log('- FAB display:', window.getComputedStyle(fab).display);
+            console.log('- FAB visibility:', window.getComputedStyle(fab).visibility);
+            console.log('- FAB z-index:', window.getComputedStyle(fab).zIndex);
+          }
+          
+          if (!fab && !webchat) {
+            document.getElementById('statusText').textContent = '⚠️ Alo loaded but button not visible. Use the "Open Chat" button above.';
+          }
+        }, 1000);
         
       } else if (checkAttempts >= maxAttempts) {
         // Failed to load
@@ -93,16 +162,8 @@
         document.getElementById('statusBox').className = 'status error';
         
         console.error('❌ Botpress failed to load after 5 seconds');
-        console.log('Debugging info:');
-        console.log('- window.botpress:', window.botpress);
-        console.log('- window.botpressWebChat:', window.botpressWebChat);
       }
     }, 100);
-    
-    // Also log any errors
-    window.addEventListener('error', function(e) {
-      console.error('Page error:', e.message);
-    });
   </script>
 </body>
 </html>
