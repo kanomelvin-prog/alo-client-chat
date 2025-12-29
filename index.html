@@ -3,20 +3,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Alo</title>
+  <title>Chat with Alo - Milestone 1 (Working)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    .status {
+      margin-top: 30px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      border-radius: 4px;
+    }
+    
+    .status.loading {
+      background: #fff3e0;
+      border-left-color: #ff9800;
+    }
+    
+    .status.error {
+      background: #ffebee;
+      border-left-color: #f44336;
+    }
+  </style>
 </head>
 <body>
-  <h1>Talk to Alo</h1>
-  <p>Click the button in the corner to start chatting</p>
+  <div class="container">
+    <h1>Talk to Alo</h1>
+    <p>Click the button in the bottom-right corner to start chatting with your AI thinking partner.</p>
+    <p style="font-size: 14px; color: #999; margin-top: 20px;">
+      <strong>Note:</strong> This is Milestone 1 - the basic Botpress widget with default styling. 
+      Later milestones will add custom design and features.
+    </p>
+    
+    <div id="statusBox" class="status loading">
+      <strong>Status:</strong> <span id="statusText">Loading Alo...</span>
+    </div>
+  </div>
   
-  <!-- Botpress v2 injection script -->
-  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+  <!-- Botpress v3 Scripts - CORRECTED -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.js"></script>
+  
   <script>
-    window.botpressWebChat.init({
-      botId: 'your-bot-id',
-      hostUrl: 'https://cdn.botpress.cloud/webchat/v2.2',
-      messagingUrl: 'https://messaging.botpress.cloud',
-      clientId: 'your-client-id'
+    // Wait for Botpress to load
+    let checkAttempts = 0;
+    const maxAttempts = 50;
+    
+    const checkBotpress = setInterval(() => {
+      checkAttempts++;
+      
+      if (window.botpress) {
+        // Success! Botpress v3 loaded
+        clearInterval(checkBotpress);
+        document.getElementById('statusText').textContent = '✅ Alo is ready! Click the chat button in the corner.';
+        document.getElementById('statusBox').className = 'status';
+        
+        console.log('✅ Botpress v3 loaded successfully');
+        console.log('Bot ID:', 'fc0fad71-daea-4d22-adf5-3a659042d46a');
+        
+      } else if (checkAttempts >= maxAttempts) {
+        // Failed to load
+        clearInterval(checkBotpress);
+        document.getElementById('statusText').textContent = '❌ Failed to load Alo. Please refresh the page.';
+        document.getElementById('statusBox').className = 'status error';
+        
+        console.error('❌ Botpress failed to load after 5 seconds');
+        console.log('Debugging info:');
+        console.log('- window.botpress:', window.botpress);
+        console.log('- window.botpressWebChat:', window.botpressWebChat);
+      }
+    }, 100);
+    
+    // Also log any errors
+    window.addEventListener('error', function(e) {
+      console.error('Page error:', e.message);
     });
   </script>
 </body>
