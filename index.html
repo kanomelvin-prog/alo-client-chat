@@ -3,101 +3,249 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Alo - Milestone 1 (Working!)</title>
+  <title>Alo - Your Thinking Partner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #FDFBF7 0%, #FAF8F5 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
     
     .container {
-      max-width: 800px;
-      margin: 0 auto;
+      max-width: 600px;
+      width: 100%;
       background: white;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 48px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: #8B9A7D;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
     }
     
     h1 {
-      color: #333;
-      margin-bottom: 10px;
+      color: #2D2A26;
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
     }
     
-    p {
-      color: #666;
+    .tagline {
+      color: #9C9589;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .description {
+      color: #2D2A26;
       font-size: 16px;
       line-height: 1.6;
+      text-align: center;
+      margin-bottom: 32px;
     }
     
     .status {
-      margin-top: 30px;
-      padding: 15px;
-      background: #e8f5e9;
-      border-left: 4px solid #4caf50;
-      border-radius: 4px;
+      padding: 16px 20px;
+      background: #E8EDE4;
+      border-left: 4px solid #8B9A7D;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
     }
     
     .status.loading {
-      background: #fff3e0;
-      border-left-color: #ff9800;
+      background: #FFF3E0;
+      border-left-color: #FF9800;
     }
     
-    .note {
-      margin-top: 20px;
-      padding: 12px;
-      background: #e3f2fd;
-      border-left: 4px solid #2196f3;
-      border-radius: 4px;
+    .status-icon {
+      font-size: 20px;
+    }
+    
+    .status-text {
+      flex: 1;
+      color: #2D2A26;
       font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .features {
+      display: grid;
+      gap: 16px;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(156, 149, 137, 0.2);
+    }
+    
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      background: #E8EDE4;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    
+    .feature-content h3 {
+      color: #2D2A26;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .feature-content p {
+      color: #9C9589;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(156, 149, 137, 0.2);
+      text-align: center;
+      color: #9C9589;
+      font-size: 12px;
+    }
+    
+    .footer a {
+      color: #8B9A7D;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Ensure chat button is visible */
+    .bpFab {
+      z-index: 9999 !important;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Talk to Alo</h1>
-    <p>Look for the chat button in the bottom-right corner to start your conversation.</p>
+    <div class="logo">A</div>
     
-    <div class="note">
-      <strong>💡 Milestone 1:</strong> This is the simplest version with Botpress default styling. 
-      The floating button should appear in the corner within a few seconds.
-    </div>
+    <h1>Alo</h1>
+    <p class="tagline">Your thinking partner between therapy sessions</p>
+    
+    <p class="description">
+      A safe space to process emotions, think through decisions, and find clarity during the 167 hours between therapy sessions.
+    </p>
     
     <div id="statusBox" class="status loading">
-      <strong>Status:</strong> <span id="statusText">Loading Alo...</span>
+      <span class="status-icon">⏳</span>
+      <span class="status-text" id="statusText">Connecting to Alo...</span>
+    </div>
+    
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-content">
+          <h3>Intention-Based Responses</h3>
+          <p>Alo adapts to what you need: listening, exploring, offering options, or simply being present.</p>
+        </div>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-content">
+          <h3>Private & Confidential</h3>
+          <p>Your conversations are between you and Alo. We don't share or sell your data.</p>
+        </div>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🤝</div>
+        <div class="feature-content">
+          <h3>Complements Therapy</h3>
+          <p>Designed to support your therapeutic work, not replace it. Available 24/7 when you need to talk.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      Built with care by <a href="https://withalo.me" target="_blank">Alo</a> • 
+      <a href="#" onclick="alert('Privacy policy coming soon'); return false;">Privacy</a> • 
+      <a href="#" onclick="alert('Terms of service coming soon'); return false;">Terms</a>
     </div>
   </div>
   
-  <!-- Botpress v3 Webchat -->
+  <!-- Botpress Webchat -->
   <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
   
   <script>
     const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
     const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
     
+    function updateStatus(text, isSuccess = true) {
+      const statusBox = document.getElementById('statusBox');
+      const statusText = document.getElementById('statusText');
+      
+      statusText.textContent = text;
+      
+      if (isSuccess) {
+        statusBox.className = 'status';
+        statusBox.querySelector('.status-icon').textContent = '✅';
+      } else {
+        statusBox.className = 'status loading';
+      }
+    }
+    
     function initBotpress() {
       if (typeof window.botpress === 'undefined') {
-        console.error('❌ Botpress not loaded');
-        document.getElementById('statusText').textContent = '❌ Failed to load. Please refresh the page.';
-        document.getElementById('statusBox').className = 'status';
-        document.getElementById('statusBox').style.borderLeftColor = '#f44336';
-        document.getElementById('statusBox').style.background = '#ffebee';
+        console.error('Botpress not loaded');
+        updateStatus('Failed to connect. Please refresh the page.', false);
         return;
       }
       
-      console.log('✅ Botpress loaded, initializing...');
-      
-      // Initialize Botpress with inline configuration
+      // Initialize Botpress
       window.botpress.init({
         botId: BOT_ID,
         clientId: CLIENT_ID,
         configuration: {
-          color: '#8B9A7D',  // Sage color
+          color: '#8B9A7D',
           variant: 'soft',
           themeMode: 'light',
-          fontFamily: 'Arial',
+          fontFamily: 'Inter',
           botName: 'Alo',
           botDescription: 'Your thinking partner',
           composerPlaceholder: 'What\'s on your mind?',
@@ -105,31 +253,22 @@
         }
       });
       
-      console.log('✅ Botpress init() called');
-      
-      // Wait for webchat to be ready
+      // Event listeners
       window.botpress.on('webchat:ready', () => {
-        console.log('✅ Webchat ready!');
-        document.getElementById('statusText').textContent = '✅ Alo is ready! Click the chat button in the corner.';
-        document.getElementById('statusBox').className = 'status';
-        
-        // Check if button appeared
-        setTimeout(() => {
-          const fab = document.querySelector('.bpFab');
-          if (fab) {
-            console.log('✅ FAB button found and visible');
-          } else {
-            console.log('⚠️ FAB button not found - it may be hidden');
-          }
-        }, 500);
+        console.log('✅ Webchat ready');
+        updateStatus('Alo is ready! Click the chat button in the corner to start.', true);
       });
       
       window.botpress.on('webchat:opened', () => {
         console.log('💬 Chat opened');
       });
+      
+      window.botpress.on('webchat:closed', () => {
+        console.log('Chat closed');
+      });
     }
     
-    // Wait for Botpress script to load, then initialize
+    // Wait for Botpress to load
     let attempts = 0;
     const maxAttempts = 50;
     
@@ -141,8 +280,8 @@
         initBotpress();
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
-        console.error('❌ Timeout waiting for Botpress');
-        document.getElementById('statusText').textContent = '❌ Timeout. Please refresh the page.';
+        console.error('Timeout waiting for Botpress');
+        updateStatus('Connection timeout. Please refresh the page.', false);
       }
     }, 100);
   </script>
