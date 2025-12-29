@@ -76,14 +76,22 @@
       color: var(--stone);
     }
 
-    /* Loading state */
-    .loading {
+    .loading-overlay {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: var(--stone);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--warm-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .loading-overlay.hidden {
+      display: none;
     }
 
     .spinner {
@@ -93,14 +101,28 @@
       border-top-color: var(--sage);
       border-radius: 50%;
       animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
+      margin-bottom: 16px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* Mobile responsive */
+    .loading-text {
+      color: var(--stone);
+      font-size: 14px;
+    }
+
+    .error {
+      background: #FEE;
+      border: 1px solid #FCC;
+      color: #C33;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px;
+      max-width: 600px;
+    }
+
     @media (max-width: 768px) {
       .container {
         max-width: 100%;
@@ -120,12 +142,19 @@
       <p>Your thinking partner between sessions</p>
     </div>
     
-    <iframe 
-      id="botpress-chat" 
-      class="chat-frame" 
-      allow="microphone"
-      title="Chat with Alo"
-    ></iframe>
+    <div style="position: relative; flex: 1;">
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Connecting to Alo...</div>
+      </div>
+
+      <iframe 
+        id="botpress-chat" 
+        class="chat-frame" 
+        allow="microphone"
+        title="Chat with Alo"
+      ></iframe>
+    </div>
     
     <div class="footer">
       <span id="user-id-display"></span>
@@ -133,41 +162,88 @@
   </div>
 
   <script>
-    // Configuration
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
     const BOTPRESS_BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
     const BOTPRESS_SHAREABLE_URL = 'https://cdn.botpress.cloud/webchat/v2.2/shareable.html';
 
-    // Generate or retrieve stable user ID
+    // ============================================================
+    // USER ID MANAGEMENT
+    // ============================================================
     function getOrCreateUserId() {
       let userId = localStorage.getItem('alo_user_id');
       if (!userId) {
         // Generate UUID-like ID
         userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
         localStorage.setItem('alo_user_id', userId);
-        console.log('Created new user ID:', userId);
+        console.log('✅ Created new user ID:', userId);
       } else {
-        console.log('Retrieved existing user ID:', userId);
+        console.log('✅ Retrieved existing user ID:', userId);
       }
       return userId;
     }
 
-    // Initialize chat
+    // ============================================================
+    // INITIALIZE CHAT
+    // ============================================================
     function initChat() {
+      console.log('🚀 Initializing chat...');
+      
       const userId = getOrCreateUserId();
       const iframe = document.getElementById('botpress-chat');
+      const loadingOverlay = document.getElementById('loading-overlay');
       
       // Build Botpress URL with user ID
       const chatUrl = `${BOTPRESS_SHAREABLE_URL}?botId=${BOTPRESS_BOT_ID}&userId=${encodeURIComponent(userId)}`;
       
-      // Load the chat
+      console.log('🔗 Loading Botpress from:', chatUrl);
+      
+      // Set iframe source
       iframe.src = chatUrl;
       
-      // Display user ID in footer (optional - can remove for production)
-      const displayId = userId.length > 20 ? userId.substring(0, 20) + '...' : userId;
-      document.getElementById('user-id-display').textContent = `Session ID: ${displayId}`;
+      // Display user ID in footer
+      const displayId = userId.length > 30 ? userId.substring(0, 30) + '...' : userId;
+      document.getElementById('user-id-display').textContent = `Session: ${displayId}`;
+      
+      // Hide loading overlay after iframe loads (or after timeout)
+      let loadingHidden = false;
+      
+      iframe.onload = function() {
+        if (!loadingHidden) {
+          console.log('✅ Iframe loaded');
+          setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+          }, 1000); // Give Botpress 1 second to initialize
+          loadingHidden = true;
+        }
+      };
+
+      iframe.onerror = function(error) {
+        console.error('❌ Iframe error:', error);
+        loadingOverlay.innerHTML = `
+          <div class="error">
+            <strong>Failed to load chat</strong><br>
+            <small>Please check your internet connection and try refreshing the page.</small>
+          </div>
+        `;
+      };
+      
+      // Fallback: hide loading after 5 seconds regardless
+      setTimeout(() => {
+        if (!loadingHidden) {
+          console.log('⏱️ Loading timeout - hiding overlay');
+          loadingOverlay.classList.add('hidden');
+          loadingHidden = true;
+        }
+      }, 5000);
     }
 
-    // Start when page loads
+    // ============================================================
+    // START
+    // ============================================================
+    console.log('📱 Chat page loaded');
+    
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initChat);
     } else {
