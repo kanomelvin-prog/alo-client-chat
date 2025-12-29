@@ -4,88 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alo | Your Therapeutic Companion</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --cream: #FDFBF7;
-            --warm-white: #FAF8F5;
-            --sage: #8B9A7D;
-            --stone: #9C9589;
-            --charcoal: #2D2A26;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--cream);
-            color: var(--charcoal);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Therapeutic Background Pattern */
-        .bg-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(var(--warm-white) 2px, transparent 2px);
-            background-size: 40px 40px;
-            z-index: -1;
-        }
-
-        .welcome-container {
-            text-align: center;
-            max-width: 400px;
-            padding: 2rem;
-            animation: fadeIn 1.5s ease-out;
-        }
-
-        h1 {
-            font-weight: 300;
-            letter-spacing: 0.1rem;
-            color: var(--sage);
-            margin-bottom: 0.5rem;
-        }
-
-        p {
-            color: var(--stone);
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--sage);
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 10px var(--sage);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Botpress Customizations via injected CSS */
-        #bp-webchat-container {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
-        }
+        :root { --cream: #FDFBF7; --warm-white: #FAF8F5; --sage: #8B9A7D; --stone: #9C9589; --charcoal: #2D2A26; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--cream); color: var(--charcoal); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(var(--warm-white) 2px, transparent 2px); background-size: 40px 40px; z-index: -1; }
+        .welcome-container { text-align: center; max-width: 400px; padding: 2rem; animation: fadeIn 1.5s ease-out; }
+        h1 { font-weight: 300; letter-spacing: 0.1rem; color: var(--sage); margin-bottom: 0.5rem; }
+        p { color: var(--stone); font-size: 1.1rem; line-height: 1.6; }
+        .status-dot { display: inline-block; width: 8px; height: 8px; background-color: var(--sage); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px var(--sage); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="bg-pattern"></div>
-
     <div class="welcome-container">
         <h1>Alo</h1>
         <p>A quiet space for your thoughts.</p>
@@ -94,43 +26,20 @@
         </div>
     </div>
 
-    <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
-    <script>
-        // 1. Manage Anonymous User ID
-        let userId = localStorage.getItem('alo_user_id');
-        if (!userId) {
-            userId = crypto.randomUUID();
-            localStorage.setItem('alo_user_id', userId);
-        }
+    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+    <script defer>
+        let userId = localStorage.getItem('alo_user_id') || crypto.randomUUID();
+        localStorage.setItem('alo_user_id', userId);
 
-        // 2. Initialize Botpress
         window.botpress.init({
             "botId": "fc0fad71-daea-4d22-adf5-3a659042d46a",
             "hostUrl": "https://cdn.botpress.cloud/webchat/v2.2",
             "messagingUrl": "https://messaging.botpress.cloud",
             "clientId": "fc0fad71-daea-4d22-adf5-3a659042d46a",
-            "webhookId": "fc0fad71-daea-4d22-adf5-3a659042d46a",
-            "lazy": true,
-            "showWidget": true,
-            "userId": userId, // Passing our stable UUID
-            "theme": {
-                "variant": "solid",
-                "content": { "fontFamily": "Inter" },
-                "components": {
-                    "button": { "backgroundColor": "#8B9A7D" }
-                }
-            },
-            "frontend": {
-                "botName": "Alo",
-                "avatarUrl": "https://raw.githubusercontent.com/lucide-static/lucide/main/icons/leaf.svg",
-                "welcomeMessage": "Hello. I'm Alo. I'm here for the 167 hours between your sessions. What's on your mind today?"
-            }
+            "userId": userId,
+            "theme": { "variant": "solid", "components": { "button": { "backgroundColor": "#8B9A7D" } } },
+            "frontend": { "botName": "Alo", "welcomeMessage": "Hello. I'm Alo. How can I help you today?" }
         });
-
-        // Open chat automatically after a short delay
-        setTimeout(() => {
-            window.botpress.sendEvent({ type: 'show' });
-        }, 1500);
     </script>
 </body>
 </html>
