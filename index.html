@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat with Alo - Milestone 1 (Manual Init)</title>
+  <title>Chat with Alo - Milestone 1 (Working!)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -45,163 +45,106 @@
       border-left-color: #ff9800;
     }
     
-    .status.error {
-      background: #ffebee;
-      border-left-color: #f44336;
-    }
-    
-    .open-chat-btn {
-      display: inline-block;
+    .note {
       margin-top: 20px;
-      padding: 15px 30px;
-      background: #8B9A7D;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .open-chat-btn:hover {
-      background: #7a8a6d;
-    }
-    
-    .open-chat-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    
-    .debug-info {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f5f5f5;
+      padding: 12px;
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
       border-radius: 4px;
-      font-family: monospace;
-      font-size: 12px;
-      color: #666;
-      max-height: 200px;
-      overflow-y: auto;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Talk to Alo</h1>
-    <p>Click the "Open Chat" button to start your conversation with Alo.</p>
-    <p style="font-size: 14px; color: #999; margin-top: 20px;">
-      <strong>Note:</strong> This is Milestone 1 - debugging Botpress initialization.
-    </p>
+    <p>Look for the chat button in the bottom-right corner to start your conversation.</p>
     
-    <button id="openChatBtn" class="open-chat-btn" disabled onclick="openChat()">
-      💬 Open Chat
-    </button>
+    <div class="note">
+      <strong>💡 Milestone 1:</strong> This is the simplest version with Botpress default styling. 
+      The floating button should appear in the corner within a few seconds.
+    </div>
     
     <div id="statusBox" class="status loading">
       <strong>Status:</strong> <span id="statusText">Loading Alo...</span>
     </div>
-    
-    <div class="debug-info" id="debugInfo">
-      Waiting for Botpress to load...
-    </div>
   </div>
   
-  <!-- Botpress v3 Scripts -->
-  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+  <!-- Botpress v3 Webchat -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
   
   <script>
-    let debugLog = [];
+    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
     
-    function addDebug(message) {
-      const timestamp = new Date().toLocaleTimeString();
-      debugLog.push(`[${timestamp}] ${message}`);
-      document.getElementById('debugInfo').innerHTML = debugLog.join('<br>');
-    }
-    
-    addDebug('Page loaded, checking for Botpress...');
-    
-    function openChat() {
-      addDebug('Open Chat button clicked');
+    function initBotpress() {
+      if (typeof window.botpress === 'undefined') {
+        console.error('❌ Botpress not loaded');
+        document.getElementById('statusText').textContent = '❌ Failed to load. Please refresh the page.';
+        document.getElementById('statusBox').className = 'status';
+        document.getElementById('statusBox').style.borderLeftColor = '#f44336';
+        document.getElementById('statusBox').style.background = '#ffebee';
+        return;
+      }
       
-      if (window.botpress) {
-        addDebug('Calling window.botpress.open()');
-        try {
-          window.botpress.open();
-          addDebug('✅ Open called successfully');
-        } catch (e) {
-          addDebug('❌ Error calling open: ' + e.message);
+      console.log('✅ Botpress loaded, initializing...');
+      
+      // Initialize Botpress with inline configuration
+      window.botpress.init({
+        botId: BOT_ID,
+        clientId: CLIENT_ID,
+        configuration: {
+          color: '#8B9A7D',  // Sage color
+          variant: 'soft',
+          themeMode: 'light',
+          fontFamily: 'Arial',
+          botName: 'Alo',
+          botDescription: 'Your thinking partner',
+          composerPlaceholder: 'What\'s on your mind?',
+          showPoweredBy: false
         }
-      } else {
-        addDebug('❌ window.botpress not available');
-        alert('Chat not ready yet. Please wait a moment and try again.');
-      }
+      });
+      
+      console.log('✅ Botpress init() called');
+      
+      // Wait for webchat to be ready
+      window.botpress.on('webchat:ready', () => {
+        console.log('✅ Webchat ready!');
+        document.getElementById('statusText').textContent = '✅ Alo is ready! Click the chat button in the corner.';
+        document.getElementById('statusBox').className = 'status';
+        
+        // Check if button appeared
+        setTimeout(() => {
+          const fab = document.querySelector('.bpFab');
+          if (fab) {
+            console.log('✅ FAB button found and visible');
+          } else {
+            console.log('⚠️ FAB button not found - it may be hidden');
+          }
+        }, 500);
+      });
+      
+      window.botpress.on('webchat:opened', () => {
+        console.log('💬 Chat opened');
+      });
     }
     
-    // Wait for Botpress inject.js to load
-    let checkAttempts = 0;
-    const maxAttempts = 100;
+    // Wait for Botpress script to load, then initialize
+    let attempts = 0;
+    const maxAttempts = 50;
     
-    const checkBotpress = setInterval(() => {
-      checkAttempts++;
+    const checkInterval = setInterval(() => {
+      attempts++;
       
       if (window.botpress) {
-        clearInterval(checkBotpress);
-        
-        addDebug('✅ window.botpress found!');
-        addDebug('Available methods: ' + Object.keys(window.botpress).join(', '));
-        
-        // Now load the configuration script
-        addDebug('Loading configuration script...');
-        const configScript = document.createElement('script');
-        configScript.src = 'https://files.bpcontent.cloud/2025/12/28/18/20251228183633-TYRFQA63.js';
-        configScript.onload = function() {
-          addDebug('✅ Configuration script loaded');
-          
-          // Wait a moment for initialization
-          setTimeout(() => {
-            const fab = document.querySelector('.bpFab');
-            const webchat = document.querySelector('.bpWebchat');
-            
-            addDebug(`FAB button: ${fab ? 'Found' : 'Not found'}`);
-            addDebug(`Webchat: ${webchat ? 'Found' : 'Not found'}`);
-            
-            if (fab || webchat) {
-              document.getElementById('statusText').textContent = '✅ Alo is ready! Click "Open Chat" or the button in the corner.';
-              document.getElementById('statusBox').className = 'status';
-            } else {
-              document.getElementById('statusText').textContent = '✅ Alo loaded. Click "Open Chat" to start.';
-              document.getElementById('statusBox').className = 'status';
-            }
-            
-            document.getElementById('openChatBtn').disabled = false;
-          }, 1500);
-        };
-        
-        configScript.onerror = function() {
-          addDebug('❌ Failed to load configuration script');
-          document.getElementById('statusText').textContent = '❌ Configuration failed to load';
-          document.getElementById('statusBox').className = 'status error';
-        };
-        
-        document.head.appendChild(configScript);
-        
-      } else if (checkAttempts >= maxAttempts) {
-        clearInterval(checkBotpress);
-        addDebug('❌ Timeout waiting for Botpress (10 seconds)');
-        document.getElementById('statusText').textContent = '❌ Failed to load Alo. Please refresh.';
-        document.getElementById('statusBox').className = 'status error';
-      }
-      
-      if (checkAttempts % 10 === 0) {
-        addDebug(`Still waiting... (${checkAttempts}/100)`);
+        clearInterval(checkInterval);
+        initBotpress();
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        console.error('❌ Timeout waiting for Botpress');
+        document.getElementById('statusText').textContent = '❌ Timeout. Please refresh the page.';
       }
     }, 100);
-    
-    // Also check what happens when window loads
-    window.addEventListener('load', () => {
-      addDebug('Window load event fired');
-    });
   </script>
 </body>
 </html>
