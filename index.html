@@ -363,11 +363,32 @@
       flex: 1;
       min-height: 400px;
       position: relative;
+      width: 100%;
     }
 
-    /* Make sure Botpress webchat fills the container */
+    /* Force Botpress webchat to render inline and fill container */
     #bp-webchat-container > div {
       height: 100% !important;
+      width: 100% !important;
+      position: relative !important;
+    }
+    
+    /* Hide the floating FAB button */
+    .bpFabButton,
+    [class*="bpFab"],
+    [class*="fabButton"] {
+      display: none !important;
+    }
+    
+    /* Force the webchat widget to be visible and inline */
+    .bpWebchat,
+    [class*="bpWebchat"] {
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
     }
 
     /* Loading */
@@ -642,6 +663,24 @@
 
       window.botpress.on('webchat:opened', () => {
         console.log('✅ Botpress webchat opened');
+        
+        // Ensure inline rendering after open
+        setTimeout(() => {
+          const webchat = document.querySelector('.bpWebchat, [class*="bpWebchat"]');
+          if (webchat) {
+            webchat.style.position = 'relative';
+            webchat.style.width = '100%';
+            webchat.style.height = '100%';
+            webchat.style.maxHeight = 'none';
+            console.log('Forced webchat inline styles');
+          }
+          
+          // Hide FAB again if it appeared
+          const fab = document.querySelector('.bpFabButton, [class*="bpFab"]');
+          if (fab) {
+            fab.style.display = 'none';
+          }
+        }, 100);
       });
 
       // Initialize Botpress
@@ -658,17 +697,29 @@
             variant: 'solid',
             showPoweredBy: false,
             showCloseButton: false,
+            showConversationListButton: false,
             containerWidth: '100%',
             layoutWidth: '100%',
             themeMode: 'light',
             botName: 'Alo',
             botDescription: 'Your therapeutic companion',
             composerPlaceholder: 'Share what\'s on your mind...',
-            color: '#8B9A7D'
+            color: '#8B9A7D',
+            useSessionStorage: true
           }
         });
         
         console.log('✅ Botpress init called successfully');
+        
+        // After init, force inline rendering by hiding FAB
+        setTimeout(() => {
+          const fab = document.querySelector('.bpFabButton, [class*="bpFab"]');
+          if (fab) {
+            fab.style.display = 'none';
+            console.log('Hidden FAB button');
+          }
+        }, 500);
+        
       } catch (error) {
         console.error('❌ Error initializing Botpress:', error);
       }
