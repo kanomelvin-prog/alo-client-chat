@@ -503,8 +503,8 @@
   
   <script>
     // Configuration
-    const SUPABASE_URL = 'https://wekvrjnbjpbvvpfuwzvz.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla3Zyam5ianBidnZwZnV3enZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzOTM4NzIsImV4cCI6MjA0OTk2OTg3Mn0.HTG4XJ-LoOJsn0rNF2APLpLEqYoPZ3NVLJ9c8HfOYMY';
+    const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
     const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
     const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
     
@@ -649,8 +649,8 @@
           .from('homework')
           .select('*')
           .eq('client_code', clientCode.toUpperCase())
-          .eq('status', 'active')
-          .order('assigned', { ascending: false });
+          .eq('active', true)
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         
@@ -671,7 +671,7 @@
 
       container.innerHTML = homework.map(hw => `
         <div class="homework-item">
-          <div class="homework-type">${hw.title || 'Exercise'}</div>
+          <div class="homework-type">${hw.homework_type || 'Exercise'}</div>
           <div class="homework-desc">${hw.description || ''}</div>
         </div>
       `).join('');
