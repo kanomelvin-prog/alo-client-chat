@@ -6,8 +6,21 @@
   <title>Alo - Your Thinking Partner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --cream: #FDFBF7;
+      --warm-white: #FAF8F5;
+      --sage: #8B9A7D;
+      --sage-light: #E8EDE4;
+      --charcoal: #2D2A26;
+      --stone: #9C9589;
+      --border: rgba(156, 149, 137, 0.2);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    
     * {
       margin: 0;
       padding: 0;
@@ -16,137 +29,284 @@
     
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #FDFBF7 0%, #FAF8F5 100%);
+      background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       padding: 20px;
     }
     
     .container {
-      max-width: 600px;
-      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Header Section */
+    .header {
       background: white;
-      padding: 48px;
+      padding: 32px;
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      text-align: center;
     }
     
     .logo {
       width: 64px;
       height: 64px;
-      background: #8B9A7D;
+      background: var(--sage);
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 24px;
+      margin: 0 auto 20px;
       color: white;
       font-size: 32px;
       font-weight: 700;
     }
     
     h1 {
-      color: #2D2A26;
+      color: var(--charcoal);
       font-size: 32px;
       font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     
     .tagline {
-      color: #9C9589;
-      font-size: 18px;
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    
-    .description {
-      color: #2D2A26;
+      color: var(--stone);
       font-size: 16px;
-      line-height: 1.6;
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    
-    .status {
-      padding: 16px 20px;
-      background: #E8EDE4;
-      border-left: 4px solid #8B9A7D;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
       margin-bottom: 24px;
     }
     
-    .status.loading {
-      background: #FFF3E0;
-      border-left-color: #FF9800;
+    /* Client Connection Card */
+    .connection-card {
+      background: var(--sage-light);
+      border: 1px solid var(--sage);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
     
-    .status-icon {
-      font-size: 20px;
+    .connection-card.connected {
+      background: #d1fae5;
+      border-color: var(--success);
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--stone);
+      border-radius: 50%;
+    }
+    
+    .status-dot.connected {
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
     .status-text {
-      flex: 1;
-      color: #2D2A26;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--charcoal);
     }
     
-    .features {
-      display: grid;
-      gap: 16px;
-      margin-top: 32px;
-      padding-top: 32px;
-      border-top: 1px solid rgba(156, 149, 137, 0.2);
-    }
-    
-    .feature {
+    .client-code-input {
       display: flex;
-      align-items: flex-start;
       gap: 12px;
     }
     
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      background: #E8EDE4;
+    .client-code-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 16px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
     }
     
-    .feature-content h3 {
-      color: #2D2A26;
+    .client-code-input button {
+      padding: 12px 24px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .client-code-input button:hover {
+      background: #7a8a6d;
+    }
+    
+    .connected-info {
+      display: none;
+      font-size: 14px;
+      color: var(--charcoal);
+    }
+    
+    .connected-info.show {
+      display: block;
+    }
+    
+    /* Session Info Card */
+    .session-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .session-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+    }
+    
+    .session-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .session-item {
+      padding: 16px;
+      background: var(--warm-white);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .session-label {
+      font-size: 12px;
+      color: var(--stone);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .session-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    
+    /* Homework Card */
+    .homework-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .homework-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .homework-count {
+      background: var(--sage);
+      color: white;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .homework-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .homework-item {
+      padding: 16px;
+      background: var(--warm-white);
+      border-radius: 8px;
+      border-left: 4px solid var(--sage);
+    }
+    
+    .homework-item.overdue {
+      border-left-color: var(--danger);
+      background: #fef2f2;
+    }
+    
+    .homework-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
       margin-bottom: 4px;
     }
     
-    .feature-content p {
-      color: #9C9589;
+    .homework-desc {
       font-size: 13px;
-      line-height: 1.4;
+      color: var(--stone);
+      margin-bottom: 8px;
     }
     
+    .homework-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--stone);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--stone);
+      font-size: 14px;
+    }
+    
+    /* Chat Section */
+    .chat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    
+    .chat-ready {
+      color: var(--success);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .chat-instructions {
+      color: var(--stone);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    /* Footer */
     .footer {
       margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(156, 149, 137, 0.2);
       text-align: center;
-      color: #9C9589;
+      color: var(--stone);
       font-size: 12px;
     }
     
     .footer a {
-      color: #8B9A7D;
+      color: var(--sage);
       text-decoration: none;
     }
     
@@ -154,52 +314,101 @@
       text-decoration: underline;
     }
     
-    /* Ensure chat button is visible */
-    .bpFab {
-      z-index: 9999 !important;
+    /* Loading state */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--sage-light);
+      border-top: 2px solid var(--sage);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+      .session-info {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo">A</div>
     
-    <h1>Alo</h1>
-    <p class="tagline">Your thinking partner between therapy sessions</p>
-    
-    <p class="description">
-      A safe space to process emotions, think through decisions, and find clarity during the 167 hours between therapy sessions.
-    </p>
-    
-    <div id="statusBox" class="status loading">
-      <span class="status-icon">⏳</span>
-      <span class="status-text" id="statusText">Connecting to Alo...</span>
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">A</div>
+      <h1>Alo</h1>
+      <p class="tagline">Your thinking partner between therapy sessions</p>
     </div>
     
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">🎯</div>
-        <div class="feature-content">
-          <h3>Intention-Based Responses</h3>
-          <p>Alo adapts to what you need: listening, exploring, offering options, or simply being present.</p>
-        </div>
+    <!-- Client Connection -->
+    <div class="connection-card" id="connectionCard">
+      <div class="connection-status">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="statusText">Not connected to therapist</div>
       </div>
       
-      <div class="feature">
-        <div class="feature-icon">🔒</div>
-        <div class="feature-content">
-          <h3>Private & Confidential</h3>
-          <p>Your conversations are between you and Alo. We don't share or sell your data.</p>
-        </div>
+      <div class="client-code-input" id="codeInput">
+        <input 
+          type="text" 
+          id="clientCodeField" 
+          placeholder="Enter your client code (e.g., ClientName-001)"
+          autocomplete="off"
+        >
+        <button onclick="connectClient()">Connect</button>
       </div>
       
-      <div class="feature">
-        <div class="feature-icon">🤝</div>
-        <div class="feature-content">
-          <h3>Complements Therapy</h3>
-          <p>Designed to support your therapeutic work, not replace it. Available 24/7 when you need to talk.</p>
+      <div class="connected-info" id="connectedInfo">
+        <strong>Connected as:</strong> <span id="clientName"></span>
+      </div>
+    </div>
+    
+    <!-- Session Info -->
+    <div class="session-card">
+      <h2>📅 Your Sessions</h2>
+      <div class="session-info">
+        <div class="session-item">
+          <div class="session-label">Last Session</div>
+          <div class="session-value" id="lastSession">Not scheduled</div>
+        </div>
+        <div class="session-item">
+          <div class="session-label">Next Session</div>
+          <div class="session-value" id="nextSession">Not scheduled</div>
         </div>
       </div>
+    </div>
+    
+    <!-- Homework -->
+    <div class="homework-card">
+      <h2>
+        📋 Your Homework
+        <span class="homework-count" id="homeworkCount">0</span>
+      </h2>
+      <div class="homework-list" id="homeworkList">
+        <div class="empty-state">
+          <div class="loading"></div>
+          <p style="margin-top: 12px;">Loading homework...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Section -->
+    <div class="chat-card">
+      <div class="chat-ready" id="chatStatus">
+        <div class="loading" style="margin: 0 auto 12px;"></div>
+        Connecting to Alo...
+      </div>
+      <p class="chat-instructions">
+        Once connected, click the chat button in the corner to start talking with Alo.
+        Available 24/7 to help you process emotions and think through decisions.
+      </p>
     </div>
     
     <div class="footer">
@@ -213,31 +422,111 @@
   <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
   
   <script>
+    // Configuration
+    const SUPABASE_URL = 'https://wekvrjnbjpbvvpfuwzvz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla3Zyam5ianBidnZwZnV3enZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzOTM4NzIsImV4cCI6MjA0OTk2OTg3Mn0.HTG4XJ-LoOJsn0rNF2APLpLEqYoPZ3NVLJ9c8HfOYMY';
     const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
     const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
     
-    function updateStatus(text, isSuccess = true) {
-      const statusBox = document.getElementById('statusBox');
-      const statusText = document.getElementById('statusText');
-      
-      statusText.textContent = text;
-      
-      if (isSuccess) {
-        statusBox.className = 'status';
-        statusBox.querySelector('.status-icon').textContent = '✅';
+    let currentClientCode = localStorage.getItem('alo_client_code') || '';
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (currentClientCode) {
+        setConnected(currentClientCode);
+        loadHomework(currentClientCode);
       } else {
-        statusBox.className = 'status loading';
+        document.getElementById('homeworkList').innerHTML = '<div class="empty-state">Connect your client code to see homework</div>';
+      }
+      
+      initBotpress();
+    });
+    
+    // Supabase query helper
+    async function supabaseQuery(endpoint) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}${endpoint}`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        
+        if (!response.ok) return null;
+        const text = await response.text();
+        return text ? JSON.parse(text) : null;
+      } catch (error) {
+        console.error('Supabase error:', error);
+        return null;
       }
     }
     
-    function initBotpress() {
-      if (typeof window.botpress === 'undefined') {
-        console.error('Botpress not loaded');
-        updateStatus('Failed to connect. Please refresh the page.', false);
+    // Connect client
+    function connectClient() {
+      const code = document.getElementById('clientCodeField').value.trim();
+      if (!code) {
+        alert('Please enter a client code');
         return;
       }
       
-      // Initialize Botpress
+      localStorage.setItem('alo_client_code', code);
+      currentClientCode = code;
+      setConnected(code);
+      loadHomework(code);
+    }
+    
+    function setConnected(code) {
+      document.getElementById('connectionCard').classList.add('connected');
+      document.getElementById('statusDot').classList.add('connected');
+      document.getElementById('statusText').textContent = 'Connected to therapist';
+      document.getElementById('codeInput').style.display = 'none';
+      document.getElementById('connectedInfo').classList.add('show');
+      document.getElementById('clientName').textContent = code;
+      document.getElementById('clientCodeField').value = code;
+    }
+    
+    // Load homework
+    async function loadHomework(clientCode) {
+      const homework = await supabaseQuery(`/rest/v1/homework?client_code=eq.${clientCode}&active=eq.true&select=*&order=created_at.desc`);
+      
+      const homeworkList = document.getElementById('homeworkList');
+      const homeworkCount = document.getElementById('homeworkCount');
+      
+      if (!homework || homework.length === 0) {
+        homeworkList.innerHTML = '<div class="empty-state">No active homework assigned</div>';
+        homeworkCount.textContent = '0';
+        return;
+      }
+      
+      homeworkCount.textContent = homework.length;
+      
+      homeworkList.innerHTML = homework.map(hw => {
+        const dueDate = hw.due_date ? new Date(hw.due_date) : null;
+        const isOverdue = dueDate && dueDate < new Date();
+        
+        return `
+          <div class="homework-item ${isOverdue ? 'overdue' : ''}">
+            <div class="homework-title">${hw.homework_type || 'Homework'}</div>
+            <div class="homework-desc">${hw.description || ''}</div>
+            <div class="homework-meta">
+              <span>📅 Assigned: ${new Date(hw.created_at).toLocaleDateString()}</span>
+              ${dueDate ? `<span>${isOverdue ? '⚠️ Overdue' : '🕐 Due: ' + dueDate.toLocaleDateString()}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Initialize Botpress
+    function initBotpress() {
+      const chatStatus = document.getElementById('chatStatus');
+      
+      if (typeof window.botpress === 'undefined') {
+        console.error('Botpress not loaded');
+        chatStatus.innerHTML = '❌ Chat unavailable (network blocked)';
+        return;
+      }
+      
       window.botpress.init({
         botId: BOT_ID,
         clientId: CLIENT_ID,
@@ -253,24 +542,15 @@
         }
       });
       
-      // Event listeners
       window.botpress.on('webchat:ready', () => {
         console.log('✅ Webchat ready');
-        updateStatus('Alo is ready! Click the chat button in the corner to start.', true);
-      });
-      
-      window.botpress.on('webchat:opened', () => {
-        console.log('💬 Chat opened');
-      });
-      
-      window.botpress.on('webchat:closed', () => {
-        console.log('Chat closed');
+        chatStatus.innerHTML = '✅ Alo is ready to talk!';
       });
     }
     
     // Wait for Botpress to load
     let attempts = 0;
-    const maxAttempts = 50;
+    const maxAttempts = 30;
     
     const checkInterval = setInterval(() => {
       attempts++;
@@ -280,8 +560,7 @@
         initBotpress();
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
-        console.error('Timeout waiting for Botpress');
-        updateStatus('Connection timeout. Please refresh the page.', false);
+        document.getElementById('chatStatus').innerHTML = '❌ Chat connection timeout';
       }
     }, 100);
   </script>
