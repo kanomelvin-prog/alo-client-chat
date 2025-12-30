@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Alo - Your Thinking Partner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FDFBF7;
+      --warm-white: #FAF8F5;
+      --sage: #8B9A7D;
+      --sage-light: #E8EDE4;
+      --charcoal: #2D2A26;
+      --stone: #9C9589;
+      --border: rgba(156, 149, 137, 0.2);
+      --success: #10b981;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* Welcome View */
+    .welcome-view {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .welcome-card {
+      background: white;
+      padding: 48px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: var(--sage);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: white;
+      font-size: 40px;
+      font-weight: 700;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .tagline {
+      color: var(--stone);
+      margin-bottom: 32px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    input {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    button {
+      padding: 14px 24px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    button:hover { background: #7a8a6d; }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: var(--stone);
+      font-size: 13px;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    
+    .guest-btn {
+      width: 100%;
+      background: var(--warm-white);
+      color: var(--charcoal);
+      border: 2px solid var(--border);
+      padding: 14px;
+    }
+    
+    .guest-btn:hover {
+      background: var(--sage-light);
+      border-color: var(--sage);
+    }
+    
+    .guest-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--stone);
+      font-style: italic;
+    }
+    
+    /* Connected View - Three Column Layout */
+    .connected-view {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+    }
+    
+    .header {
+      background: var(--sage);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #90EE90;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .header-btn {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      font-size: 12px;
+    }
+    
+    .header-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    /* Main Layout - Two columns now */
+    .main-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Chat Area - Now on left */
+    .chat-area {
+      flex: 1;
+      position: relative;
+      background: var(--warm-white);
+      overflow: hidden;
+      padding: 9%;
+    }
+    
+    #chatContainer {
+      position: absolute;
+      top: 9%;
+      left: 9%;
+      right: 9%;
+      bottom: 9%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    /* Right Sidebar - Stacked homework and notes */
+    .right-sidebar {
+      width: 320px;
+      background: var(--warm-white);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    /* Homework Section */
+    .homework-section {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    /* Notes Section */
+    .notes-section {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Remove old sidebar styles */
+    .homework-sidebar {
+      display: none;
+    }
+    
+    .notes-sidebar {
+      display: none;
+    }
+    
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .homework-item {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--sage);
+      margin-bottom: 12px;
+    }
+    
+    .homework-type {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sage);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    
+    .homework-desc {
+      font-size: 13px;
+      color: var(--charcoal);
+    }
+    
+    .homework-empty {
+      text-align: center;
+      color: var(--stone);
+      font-size: 13px;
+      padding: 32px 16px;
+    }
+    
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      position: relative;
+      background: var(--warm-white);
+      overflow: hidden;
+      padding: 9%;
+    }
+    
+    #chatContainer {
+      position: absolute;
+      top: 9%;
+      left: 9%;
+      right: 9%;
+      bottom: 9%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    /* Notes Sidebar */
+    .notes-sidebar {
+      width: 280px;
+      background: var(--warm-white);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .notes-textarea {
+      flex: 1;
+      min-height: 150px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+    
+    .notes-saved {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      color: var(--success);
+      font-size: 12px;
+    }
+    
+    .notes-saved.show {
+      display: flex;
+    }
+    
+    .sent-messages {
+      margin-top: 20px;
+    }
+    
+    .sent-message {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    
+    .sent-date {
+      color: var(--stone);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    
+    /* Botpress Overrides */
+    .bpFab { display: none !important; }
+    
+    .bpWebchat {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    
+    .bpHeaderContainer {
+      display: none !important;
+    }
+    
+    /* Loading */
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--sage-light);
+      border-top-color: var(--sage);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* ========================================
+       MOBILE OPTIMIZATION
+       ======================================== */
+    @media (max-width: 768px) {
+      /* Welcome screen mobile */
+      .welcome-card {
+        padding: 32px 24px;
+        margin: 16px;
+      }
+      
+      .logo {
+        width: 64px;
+        height: 64px;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      .tagline {
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      input, button {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      
+      .guest-btn {
+        padding: 16px;
+        font-size: 16px;
+      }
+      
+      /* Chat view mobile - stack vertically */
+      .chat-view {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      
+      .chat-header {
+        order: 1;
+        padding: 16px;
+        border-radius: 0;
+        flex-shrink: 0;
+      }
+      
+      /* Main layout becomes vertical */
+      .main-layout {
+        order: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      
+      /* Chat area takes available space */
+      .chat-area {
+        order: 1;
+        flex: 1;
+        width: 100%;
+        padding: 0;
+        min-height: 0;
+      }
+      
+      #chatContainer {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+      
+      /* Sidebar goes below chat */
+      .right-sidebar, .sidebar {
+        order: 2;
+        width: 100%;
+        max-width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        flex-shrink: 0;
+        max-height: none;
+        overflow-y: visible;
+      }
+      
+      /* Collapsible sections on mobile */
+      .sidebar-section {
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .sidebar-section:last-child {
+        border-bottom: none;
+      }
+      
+      /* Make homework and notes compact on mobile by default */
+      .sidebar-section h3 {
+        cursor: pointer;
+        user-select: none;
+        padding: 16px;
+        margin: 0;
+        background: var(--warm-white);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .sidebar-section h3::after {
+        content: '▼';
+        font-size: 12px;
+        transition: transform 0.3s;
+      }
+      
+      .sidebar-section.collapsed h3::after {
+        transform: rotate(-90deg);
+      }
+      
+      .sidebar-section.collapsed .homework-list,
+      .sidebar-section.collapsed .note-form,
+      .sidebar-section.collapsed .sent-messages {
+        display: none;
+      }
+      
+      .homework-list,
+      .note-form,
+      .sent-messages {
+        padding: 12px;
+      }
+      
+      .chat-header {
+        padding: 16px;
+        border-radius: 0;
+      }
+      
+      .status-text {
+        font-size: 12px;
+      }
+      
+      .new-chat-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      
+      .chat-container {
+        padding: 16px;
+      }
+      
+      .message {
+        max-width: 85%;
+      }
+      
+      .user-message {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .bot-message {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .chat-input {
+        padding: 16px;
+        gap: 8px;
+        border-radius: 0;
+      }
+      
+      #messageInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+      }
+      
+      .send-btn {
+        width: 48px;
+        height: 48px;
+        padding: 12px;
+      }
+      
+      /* Note panel mobile - make it a bottom sheet */
+      .note-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 70vh;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      
+      .note-header {
+        padding: 20px 16px 16px;
+        border-radius: 20px 20px 0 0;
+      }
+      
+      .note-content {
+        padding: 16px;
+      }
+      
+      #noteTextarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        min-height: 200px;
+      }
+      
+      .note-footer {
+        padding: 16px;
+      }
+      
+      /* Disconnect modal mobile */
+      .modal-content {
+        margin: 16px;
+        padding: 24px;
+        max-width: calc(100% - 32px);
+      }
+      
+      /* Mobile-specific improvements */
+      body.mobile-view {
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Prevent zoom on input focus for iOS */
+      input[type="text"],
+      textarea {
+        font-size: 16px !important;
+      }
+      
+      /* Better touch targets */
+      button, .clickable {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      
+      /* Hide scrollbar on mobile for cleaner look */
+      .chat-messages::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    
+    /* Small phones */
+    @media (max-width: 375px) {
+      .welcome-card {
+        padding: 24px 16px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .logo {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome View -->
+  <div class="welcome-view" id="welcomeView">
+    <div class="welcome-card">
+      <div class="logo">A</div>
+      <h1>Alo</h1>
+      <p class="tagline">Your thinking partner between therapy sessions</p>
+      <div class="input-group">
+        <input 
+          type="text" 
+          id="clientCodeInput" 
+          placeholder="Enter client code (e.g., SARAH-001)"
+          onkeypress="if(event.key==='Enter') connectClient()"
+        >
+        <button onclick="connectClient()">Connect</button>
+      </div>
+      
+      <!-- Demo hint for Dr. Dupree -->
+      <p style="font-size: 0.75rem; color: var(--stone); text-align: center; margin-top: 0.5rem; font-style: italic; opacity: 0.7;">
+        Demo code: ClientName-001
+      </p>
+      
+      <div class="divider">or</div>
+      
+      <button class="guest-btn" onclick="connectAsGuest()">
+        🌟 Try Alo Free - No Code Needed
+      </button>
+      <p class="guest-note">
+        Experience Alo instantly. Perfect for exploring before connecting with your therapist.
+      </p>
+      
+      <p style="font-size: 12px; color: var(--stone); margin-top: 24px;">
+        Don't have a code? Ask your therapist.
+      </p>
+    </div>
+  </div>
+
+  <!-- Connected View -->
+  <div class="connected-view" id="connectedView">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="pulse-dot"></div>
+        <span>Connected as <strong id="connectedCode">DEMO</strong></span>
+      </div>
+      <div>
+        <button class="header-btn" onclick="newChat()">New Chat</button>
+        <button class="header-btn" onclick="disconnect()">Disconnect</button>
+      </div>
+    </div>
+
+    <!-- Main Two-Column Layout -->
+    <div class="main-layout">
+      
+      <!-- Chat Area (Left) -->
+      <div class="chat-area">
+        <div class="loading" id="loadingOverlay">
+          <div class="spinner"></div>
+          <p style="color: var(--stone); font-size: 14px;">Connecting to Alo...</p>
+        </div>
+        <div id="chatContainer"></div>
+      </div>
+
+      <!-- Right Sidebar (Stacked: Homework + Notes) -->
+      <div class="right-sidebar sidebar" id="rightSidebar">
+        
+        <!-- Homework Section (Top) -->
+        <div class="sidebar-section homework-section" id="homeworkSection">
+          <h3 class="sidebar-title">📋 Your Homework</h3>
+          <div class="homework-list" id="homeworkList">
+            <div class="homework-empty">Loading homework...</div>
+          </div>
+        </div>
+
+        <!-- Notes Section (Bottom) -->
+        <div class="sidebar-section notes-section" id="notesSection">
+          <h3 class="sidebar-title">💬 Notes to Therapist</h3>
+          <div class="note-form">
+            <p style="font-size: 12px; color: var(--stone); margin-bottom: 12px;">
+              Share anything you'd like to discuss in your next session.
+            </p>
+            <textarea 
+              id="notesTextarea" 
+              class="notes-textarea" 
+              placeholder="What's been on your mind?"
+            ></textarea>
+            <button onclick="sendNotes()">Send to Therapist</button>
+            <div class="notes-saved" id="notesSaved">
+              ✓ Sent successfully!
+            </div>
+            
+            <div class="sent-messages">
+              <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--stone);">Previously Sent</h4>
+              <div id="sentMessagesList"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Botpress -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+  
+  <script>
+    // Mobile Detection
+    const isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent) 
+                     || window.innerWidth <= 768;
+    
+    if (isMobile) {
+      document.body.classList.add('mobile-view');
+      console.log('📱 Mobile device detected - optimized layout loaded');
+      
+      // Make sidebar sections collapsible on mobile
+      document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('.sidebar-section');
+        sections.forEach(section => {
+          const header = section.querySelector('h3');
+          if (header) {
+            // Start collapsed on mobile
+            section.classList.add('collapsed');
+            
+            header.addEventListener('click', () => {
+              section.classList.toggle('collapsed');
+            });
+          }
+        });
+      });
+    }
+    
+    // Configuration
+    const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
+    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
+    
+    let db = null;
+    let clientCode = localStorage.getItem('aloClientCode');
+    let botpressInitialized = false;
+
+    // Initialize
+    window.addEventListener('load', () => {
+      // Initialize Supabase
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      // Auto-connect if code exists
+      if (clientCode) {
+        switchToConnectedView(clientCode);
+      }
+    });
+
+    function connectClient() {
+      const input = document.getElementById('clientCodeInput');
+      const code = input.value.trim(); // Keep original case
+      
+      if (!code) {
+        alert('Please enter a client code');
+        return;
+      }
+      
+      localStorage.setItem('aloClientCode', code);
+      clientCode = code;
+      switchToConnectedView(code);
+    }
+
+    function connectAsGuest() {
+      // Generate a guest code
+      const guestCode = 'GUEST-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Don't save guest code to localStorage
+      clientCode = guestCode;
+      
+      // Hide homework and notes for guest users
+      switchToConnectedView(guestCode, true);
+    }
+
+    function switchToConnectedView(code, isGuest = false) {
+      document.getElementById('welcomeView').style.display = 'none';
+      document.getElementById('connectedView').style.display = 'flex';
+      document.getElementById('connectedCode').textContent = code;
+      
+      // Hide/show sidebar based on guest mode
+      const rightSidebar = document.getElementById('rightSidebar');
+      
+      if (isGuest) {
+        // Hide sidebar for guest
+        rightSidebar.style.display = 'none';
+      } else {
+        // Show sidebar for regular users
+        rightSidebar.style.display = 'flex';
+        
+        // Load data
+        loadHomework();
+        loadSentMessages();
+      }
+      
+      // Initialize chat
+      setTimeout(() => initBotpress(code), 100);
+    }
+
+    function hideLoading() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function moveWebchatToContainer() {
+      const webchat = document.querySelector('.bpWebchat');
+      const container = document.getElementById('chatContainer');
+      
+      if (webchat && container && webchat.parentElement !== container) {
+        container.appendChild(webchat);
+        console.log('✅ Webchat moved to container');
+      }
+    }
+
+    function initBotpress(userId) {
+      if (botpressInitialized) return;
+      
+      if (typeof window.botpress === 'undefined') {
+        setTimeout(() => initBotpress(userId), 100);
+        return;
+      }
+
+      console.log('🚀 Initializing Botpress...');
+
+      window.botpress.on('webchat:ready', () => {
+        console.log('✅ Webchat ready');
+        hideLoading();
+        
+        // Start with fresh conversation
+        if (window.botpress.restartConversation) {
+          window.botpress.restartConversation().then(() => {
+            console.log('🔄 Started fresh conversation');
+            window.botpress.open();
+            setTimeout(moveWebchatToContainer, 100);
+          }).catch(() => {
+            // If restart fails, just open normally
+            window.botpress.open();
+            setTimeout(moveWebchatToContainer, 100);
+          });
+        } else {
+          window.botpress.open();
+          setTimeout(moveWebchatToContainer, 100);
+        }
+      });
+
+      window.botpress.on('webchat:opened', () => {
+        console.log('💬 Chat opened');
+        moveWebchatToContainer();
+      });
+
+      window.botpress.init({
+        botId: BOT_ID,
+        clientId: CLIENT_ID,
+        userData: { id: userId },
+        configuration: {
+          color: '#8B9A7D',
+          themeMode: 'light',
+          botName: 'Alo',
+          composerPlaceholder: "What's on your mind?",
+          showPoweredBy: false
+        }
+      });
+
+      botpressInitialized = true;
+      
+      // Keep webchat in container
+      setInterval(moveWebchatToContainer, 1000);
+    }
+
+    // Homework Functions
+    async function loadHomework() {
+      console.log('🔍 === LOADING HOMEWORK ===');
+      console.log('Client Code:', clientCode);
+      console.log('Database URL:', SUPABASE_URL);
+      
+      try {
+        // Load ALL active homework, then filter client-side (case-insensitive)
+        const url = `${SUPABASE_URL}/rest/v1/homework?active=eq.true&order=created_at.desc`;
+        console.log('🔗 Query URL:', url);
+        
+        const response = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          }
+        });
+
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const allHomework = await response.json();
+        console.log('📦 Total homework items:', allHomework?.length);
+        console.log('All client codes in homework:', [...new Set(allHomework?.map(h => h.client_code))]);
+        
+        // Filter to current client (case-insensitive)
+        const data = allHomework?.filter(h => 
+          h.client_code.toLowerCase() === clientCode.toLowerCase()
+        ) || [];
+        
+        console.log('📦 Filtered homework for', clientCode, ':', data.length, 'items');
+        console.log('Matching homework:', data);
+        
+        renderHomework(data);
+      } catch (error) {
+        console.error('💥 Error loading homework:', error);
+        alert(`Error loading homework: ${error.message}`);
+        renderHomework([]);
+      }
+    }
+
+    function renderHomework(homework) {
+      const container = document.getElementById('homeworkList');
+      
+      console.log('🎨 Rendering homework:', homework.length, 'items');
+      
+      if (!homework.length) {
+        container.innerHTML = '<div class="homework-empty">No homework assigned</div>';
+        return;
+      }
+
+      container.innerHTML = homework.map(hw => `
+        <div class="homework-item">
+          <div class="homework-type">${hw.homework_type || 'Exercise'}</div>
+          <div class="homework-desc">${hw.description || ''}</div>
+        </div>
+      `).join('');
+      
+      console.log('✅ Homework rendered successfully');
+    }
+
+    // Notes Functions
+    async function sendNotes() {
+      const textarea = document.getElementById('notesTextarea');
+      const message = textarea.value.trim();
+      
+      console.log('📝 === SENDING NOTE ===');
+      console.log('Client Code:', clientCode);
+      console.log('Message:', message);
+      console.log('Database URL:', SUPABASE_URL);
+      
+      if (!message) {
+        alert('Please write a note first');
+        return;
+      }
+
+      try {
+        const payload = {
+          client_code: clientCode,
+          message: message,
+          created_at: new Date().toISOString()
+        };
+        
+        console.log('📤 Sending payload:', payload);
+        
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/client_messages`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        console.log('✅ Note sent successfully!');
+
+        // Show success
+        const saved = document.getElementById('notesSaved');
+        saved.classList.add('show');
+        setTimeout(() => saved.classList.remove('show'), 3000);
+
+        // Clear textarea
+        textarea.value = '';
+
+        // Reload messages
+        await loadSentMessages();
+        
+      } catch (error) {
+        console.error('💥 Error sending note:', error);
+        alert(`Error sending note: ${error.message}`);
+      }
+    }
+
+    async function loadSentMessages() {
+      console.log('📬 === LOADING SENT MESSAGES ===');
+      console.log('Client Code:', clientCode);
+      
+      try {
+        // Load ALL messages, then filter client-side (case-insensitive)
+        const url = `${SUPABASE_URL}/rest/v1/client_messages?order=created_at.desc&limit=100`;
+        console.log('🔗 Query URL:', url);
+        
+        const response = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          }
+        });
+
+        console.log('📥 Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const allMessages = await response.json();
+        console.log('📦 Total messages:', allMessages?.length);
+        console.log('All client codes in messages:', [...new Set(allMessages?.map(m => m.client_code))]);
+        
+        // Filter to current client (case-insensitive)
+        const data = allMessages?.filter(m => 
+          m.client_code.toLowerCase() === clientCode.toLowerCase()
+        ).slice(0, 5) || [];
+        
+        console.log('📨 Filtered messages for', clientCode, ':', data.length);
+        console.log('Matching messages:', data);
+
+        const container = document.getElementById('sentMessagesList');
+        
+        if (!data || !data.length) {
+          container.innerHTML = '<p style="font-size: 12px; color: var(--stone);">No messages yet</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(msg => `
+          <div class="sent-message">
+            <div class="sent-date">${new Date(msg.created_at).toLocaleDateString()}</div>
+            <div>${msg.message}</div>
+          </div>
+        `).join('');
+        
+        console.log(`✅ Loaded ${data.length} messages`);
+      } catch (error) {
+        console.error('💥 Error loading messages:', error);
+      }
+    }
+
+    function newChat() {
+      if (confirm('Start a new conversation?')) {
+        if (window.botpress && window.botpress.restartConversation) {
+          window.botpress.restartConversation().then(() => {
+            console.log('🔄 New conversation started');
+            window.botpress.open();
+          }).catch((error) => {
+            console.error('Error restarting conversation:', error);
+            // Fallback to close/open
+            window.botpress.close();
+            setTimeout(() => window.botpress.open(), 200);
+          });
+        } else {
+          // Fallback if restartConversation not available
+          window.botpress.close();
+          setTimeout(() => window.botpress.open(), 200);
+        }
+      }
+    }
+
+    function disconnect() {
+      localStorage.removeItem('aloClientCode');
+      window.location.reload();
+    }
+  </script>
+
+</body>
+</html>
