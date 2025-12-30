@@ -525,7 +525,7 @@
 
     function connectClient() {
       const input = document.getElementById('clientCodeInput');
-      const code = input.value.trim().toUpperCase();
+      const code = input.value.trim(); // Keep original case
       
       if (!code) {
         alert('Please enter a client code');
@@ -644,19 +644,32 @@
 
     // Homework Functions
     async function loadHomework() {
+      console.log('🔍 Loading homework for client:', clientCode);
+      
       try {
         const { data, error } = await db
           .from('homework')
           .select('*')
-          .eq('client_code', clientCode.toUpperCase())
+          .eq('client_code', clientCode) // Use exact case from input
           .eq('active', true)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        console.log('📦 Homework query result:', { 
+          client_code: clientCode,
+          found: data?.length || 0,
+          data: data,
+          error: error 
+        });
         
+        if (error) {
+          console.error('❌ Homework error:', error);
+          throw error;
+        }
+        
+        console.log(`✅ Found ${data?.length || 0} homework items`);
         renderHomework(data || []);
       } catch (error) {
-        console.error('Error loading homework:', error);
+        console.error('💥 Error loading homework:', error);
         renderHomework([]);
       }
     }
@@ -682,6 +695,8 @@
       const textarea = document.getElementById('notesTextarea');
       const message = textarea.value.trim();
       
+      console.log('📝 Sending note for client:', clientCode);
+      
       if (!message) {
         alert('Please write a note first');
         return;
@@ -691,10 +706,16 @@
         const { error } = await db
           .from('client_messages')
           .insert({
-            client_code: clientCode.toUpperCase(),
+            client_code: clientCode, // Use exact case
             message: message,
             created_at: new Date().toISOString()
           });
+
+        console.log('📤 Note send result:', { 
+          client_code: clientCode,
+          success: !error,
+          error: error 
+        });
 
         if (error) throw error;
 
@@ -708,20 +729,29 @@
 
         // Reload messages
         loadSentMessages();
+        console.log('✅ Note sent successfully');
       } catch (error) {
-        console.error('Error sending note:', error);
+        console.error('💥 Error sending note:', error);
         alert('Error sending note. Please try again.');
       }
     }
 
     async function loadSentMessages() {
+      console.log('📬 Loading sent messages for:', clientCode);
+      
       try {
         const { data, error } = await db
           .from('client_messages')
           .select('*')
-          .eq('client_code', clientCode.toUpperCase())
+          .eq('client_code', clientCode) // Use exact case
           .order('created_at', { ascending: false })
           .limit(5);
+
+        console.log('📨 Messages result:', {
+          client_code: clientCode,
+          found: data?.length || 0,
+          error: error
+        });
 
         if (error) throw error;
 
@@ -738,8 +768,10 @@
             <div>${msg.message}</div>
           </div>
         `).join('');
+        
+        console.log(`✅ Loaded ${data.length} messages`);
       } catch (error) {
-        console.error('Error loading messages:', error);
+        console.error('💥 Error loading messages:', error);
       }
     }
 
