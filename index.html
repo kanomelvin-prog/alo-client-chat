@@ -98,6 +98,43 @@
     
     button:hover { background: #7a8a6d; }
     
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+      color: var(--stone);
+      font-size: 13px;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    
+    .guest-btn {
+      width: 100%;
+      background: var(--warm-white);
+      color: var(--charcoal);
+      border: 2px solid var(--border);
+      padding: 14px;
+    }
+    
+    .guest-btn:hover {
+      background: var(--sage-light);
+      border-color: var(--sage);
+    }
+    
+    .guest-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--stone);
+      font-style: italic;
+    }
+    
     /* Connected View - Three Column Layout */
     .connected-view {
       display: none;
@@ -200,16 +237,21 @@
     .chat-area {
       flex: 1;
       position: relative;
-      background: white;
+      background: var(--warm-white);
       overflow: hidden;
+      padding: 20px;
     }
     
     #chatContainer {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     
     /* Notes Sidebar */
@@ -327,7 +369,17 @@
         >
         <button onclick="connectClient()">Connect</button>
       </div>
-      <p style="font-size: 12px; color: var(--stone); margin-top: 16px;">
+      
+      <div class="divider">or</div>
+      
+      <button class="guest-btn" onclick="connectAsGuest()">
+        💬 Try Alo as a Guest
+      </button>
+      <p class="guest-note">
+        Guest sessions are not saved and do not connect to a therapist.
+      </p>
+      
+      <p style="font-size: 12px; color: var(--stone); margin-top: 24px;">
         Don't have a code? Ask your therapist.
       </p>
     </div>
@@ -435,14 +487,39 @@
       switchToConnectedView(code);
     }
 
-    function switchToConnectedView(code) {
+    function connectAsGuest() {
+      // Generate a guest code
+      const guestCode = 'GUEST-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Don't save guest code to localStorage
+      clientCode = guestCode;
+      
+      // Hide homework and notes for guest users
+      switchToConnectedView(guestCode, true);
+    }
+
+    function switchToConnectedView(code, isGuest = false) {
       document.getElementById('welcomeView').style.display = 'none';
       document.getElementById('connectedView').style.display = 'flex';
       document.getElementById('connectedCode').textContent = code;
       
-      // Load data
-      loadHomework();
-      loadSentMessages();
+      // Hide/show sidebars based on guest mode
+      const homeworkSidebar = document.querySelector('.homework-sidebar');
+      const notesSidebar = document.querySelector('.notes-sidebar');
+      
+      if (isGuest) {
+        // Hide sidebars for guest
+        homeworkSidebar.style.display = 'none';
+        notesSidebar.style.display = 'none';
+      } else {
+        // Show sidebars for regular users
+        homeworkSidebar.style.display = 'block';
+        notesSidebar.style.display = 'flex';
+        
+        // Load data
+        loadHomework();
+        loadSentMessages();
+      }
       
       // Initialize chat
       setTimeout(() => initBotpress(code), 100);
