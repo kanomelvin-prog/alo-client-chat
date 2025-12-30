@@ -157,7 +157,26 @@
     }
     
     .connected-info.show {
-      display: block;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logoff-btn {
+      padding: 8px 16px;
+      background: white;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .logoff-btn:hover {
+      background: var(--warm-white);
+      border-color: var(--stone);
     }
     
     /* Session Info Card */
@@ -295,6 +314,33 @@
       color: var(--stone);
       font-size: 14px;
       line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .guest-chat-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--warm-white);
+      color: var(--charcoal);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    
+    .guest-chat-btn:hover {
+      background: var(--sage-light);
+      border-color: var(--sage);
+    }
+    
+    .guest-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--stone);
+      font-style: italic;
     }
     
     /* Footer */
@@ -366,7 +412,10 @@
       </div>
       
       <div class="connected-info" id="connectedInfo">
-        <strong>Connected as:</strong> <span id="clientName"></span>
+        <div>
+          <strong>Connected as:</strong> <span id="clientName"></span>
+        </div>
+        <button class="logoff-btn" onclick="logoff()">Disconnect</button>
       </div>
     </div>
     
@@ -409,6 +458,15 @@
         Once connected, click the chat button in the corner to start talking with Alo.
         Available 24/7 to help you process emotions and think through decisions.
       </p>
+      
+      <div id="guestChatSection" style="display: none;">
+        <button class="guest-chat-btn" onclick="startGuestChat()">
+          💬 Chat as Guest
+        </button>
+        <p class="guest-note">
+          Chat without connecting to a therapist. Your conversation won't be saved to a dashboard.
+        </p>
+      </div>
     </div>
     
     <div class="footer">
@@ -437,6 +495,8 @@
         loadHomework(currentClientCode);
       } else {
         document.getElementById('homeworkList').innerHTML = '<div class="empty-state">Connect your client code to see homework</div>';
+        // Show guest chat button if not connected
+        document.getElementById('guestChatSection').style.display = 'block';
       }
       
       initBotpress();
@@ -483,6 +543,44 @@
       document.getElementById('connectedInfo').classList.add('show');
       document.getElementById('clientName').textContent = code;
       document.getElementById('clientCodeField').value = code;
+      
+      // Hide guest chat button when connected
+      document.getElementById('guestChatSection').style.display = 'none';
+    }
+    
+    // Logoff function
+    function logoff() {
+      if (!confirm('Are you sure you want to disconnect? Your homework and session info will be hidden.')) {
+        return;
+      }
+      
+      localStorage.removeItem('alo_client_code');
+      currentClientCode = '';
+      
+      // Reset UI
+      document.getElementById('connectionCard').classList.remove('connected');
+      document.getElementById('statusDot').classList.remove('connected');
+      document.getElementById('statusText').textContent = 'Not connected to therapist';
+      document.getElementById('codeInput').style.display = 'flex';
+      document.getElementById('connectedInfo').classList.remove('show');
+      document.getElementById('clientCodeField').value = '';
+      
+      // Clear homework
+      document.getElementById('homeworkList').innerHTML = '<div class="empty-state">Connect your client code to see homework</div>';
+      document.getElementById('homeworkCount').textContent = '0';
+      
+      // Show guest chat button
+      document.getElementById('guestChatSection').style.display = 'block';
+    }
+    
+    // Guest chat function
+    function startGuestChat() {
+      // Just open the Botpress chat
+      if (window.botpress && window.botpress.open) {
+        window.botpress.open();
+      } else {
+        alert('Chat is loading... please try again in a moment.');
+      }
     }
     
     // Load homework
