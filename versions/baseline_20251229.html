@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alo - Your Thinking Partner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #FDFBF7 0%, #FAF8F5 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: white;
+      padding: 48px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: #8B9A7D;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    h1 {
+      color: #2D2A26;
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    
+    .tagline {
+      color: #9C9589;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .description {
+      color: #2D2A26;
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .status {
+      padding: 16px 20px;
+      background: #E8EDE4;
+      border-left: 4px solid #8B9A7D;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .status.loading {
+      background: #FFF3E0;
+      border-left-color: #FF9800;
+    }
+    
+    .status-icon {
+      font-size: 20px;
+    }
+    
+    .status-text {
+      flex: 1;
+      color: #2D2A26;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .features {
+      display: grid;
+      gap: 16px;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(156, 149, 137, 0.2);
+    }
+    
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      background: #E8EDE4;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    
+    .feature-content h3 {
+      color: #2D2A26;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .feature-content p {
+      color: #9C9589;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(156, 149, 137, 0.2);
+      text-align: center;
+      color: #9C9589;
+      font-size: 12px;
+    }
+    
+    .footer a {
+      color: #8B9A7D;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Ensure chat button is visible */
+    .bpFab {
+      z-index: 9999 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">A</div>
+    
+    <h1>Alo</h1>
+    <p class="tagline">Your thinking partner between therapy sessions</p>
+    
+    <p class="description">
+      A safe space to process emotions, think through decisions, and find clarity during the 167 hours between therapy sessions.
+    </p>
+    
+    <div id="statusBox" class="status loading">
+      <span class="status-icon">⏳</span>
+      <span class="status-text" id="statusText">Connecting to Alo...</span>
+    </div>
+    
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-content">
+          <h3>Intention-Based Responses</h3>
+          <p>Alo adapts to what you need: listening, exploring, offering options, or simply being present.</p>
+        </div>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-content">
+          <h3>Private & Confidential</h3>
+          <p>Your conversations are between you and Alo. We don't share or sell your data.</p>
+        </div>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">🤝</div>
+        <div class="feature-content">
+          <h3>Complements Therapy</h3>
+          <p>Designed to support your therapeutic work, not replace it. Available 24/7 when you need to talk.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      Built with care by <a href="https://withalo.me" target="_blank">Alo</a> • 
+      <a href="#" onclick="alert('Privacy policy coming soon'); return false;">Privacy</a> • 
+      <a href="#" onclick="alert('Terms of service coming soon'); return false;">Terms</a>
+    </div>
+  </div>
+  
+  <!-- Botpress Webchat -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+  
+  <script>
+    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
+    
+    function updateStatus(text, isSuccess = true) {
+      const statusBox = document.getElementById('statusBox');
+      const statusText = document.getElementById('statusText');
+      
+      statusText.textContent = text;
+      
+      if (isSuccess) {
+        statusBox.className = 'status';
+        statusBox.querySelector('.status-icon').textContent = '✅';
+      } else {
+        statusBox.className = 'status loading';
+      }
+    }
+    
+    function initBotpress() {
+      if (typeof window.botpress === 'undefined') {
+        console.error('Botpress not loaded');
+        updateStatus('Failed to connect. Please refresh the page.', false);
+        return;
+      }
+      
+      // Initialize Botpress
+      window.botpress.init({
+        botId: BOT_ID,
+        clientId: CLIENT_ID,
+        configuration: {
+          color: '#8B9A7D',
+          variant: 'soft',
+          themeMode: 'light',
+          fontFamily: 'Inter',
+          botName: 'Alo',
+          botDescription: 'Your thinking partner',
+          composerPlaceholder: 'What\'s on your mind?',
+          showPoweredBy: false
+        }
+      });
+      
+      // Event listeners
+      window.botpress.on('webchat:ready', () => {
+        console.log('✅ Webchat ready');
+        updateStatus('Alo is ready! Click the chat button in the corner to start.', true);
+      });
+      
+      window.botpress.on('webchat:opened', () => {
+        console.log('💬 Chat opened');
+      });
+      
+      window.botpress.on('webchat:closed', () => {
+        console.log('Chat closed');
+      });
+    }
+    
+    // Wait for Botpress to load
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    const checkInterval = setInterval(() => {
+      attempts++;
+      
+      if (window.botpress) {
+        clearInterval(checkInterval);
+        initBotpress();
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        console.error('Timeout waiting for Botpress');
+        updateStatus('Connection timeout. Please refresh the page.', false);
+      }
+    }, 100);
+  </script>
+</body>
+</html>
