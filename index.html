@@ -358,10 +358,16 @@
       position: relative;
     }
 
-    /* Botpress will inject here */
+    /* Botpress container - CRITICAL FIX */
     #bp-webchat-container {
       flex: 1;
       min-height: 400px;
+      position: relative;
+    }
+
+    /* Make sure Botpress webchat fills the container */
+    #bp-webchat-container > div {
+      height: 100% !important;
     }
 
     /* Loading */
@@ -507,18 +513,19 @@
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Botpress Webchat -->
-  <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
+  <!-- Botpress Webchat - v3.3 for better stability -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
   
   <script>
     // ============================================================
     // CONFIGURATION
     // ============================================================
-    const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
+    const SUPABASE_URL = 'https://wekvrjnbjpbvvpfuwzvz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla3Zyam5ianBidnZwZnV3enZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzOTM4NzIsImV4cCI6MjA0OTk2OTg3Mn0.HTG4XJ-LoOJsn0rNF2APLpLEqYoPZ3NVLJ9c8HfOYMY';
     
-    // Botpress config
-    const BOTPRESS_CONFIG_URL = 'https://files.bpcontent.cloud/2025/12/27/17/20251227172643-NCZVT39H.json';
+    // Botpress config - CRITICAL FIX: Use botId/clientId instead of configUrl
+    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
 
     // ============================================================
     // STATE
@@ -598,36 +605,73 @@
       loadNotes();
     }
 
+    // ============================================================
+    // BOTPRESS INITIALIZATION - CRITICAL FIX
+    // ============================================================
     function initBotpress(userId) {
+      console.log('Initializing Botpress for user:', userId);
+      
       if (botpressLoaded) {
         // If already loaded, just update the user
-        window.botpress.updateUser({ id: userId });
-        window.botpress.open();
+        console.log('Botpress already loaded, updating user...');
+        if (window.botpress && window.botpress.updateUser) {
+          window.botpress.updateUser({ id: userId });
+          window.botpress.open();
+        }
         return;
       }
 
-      window.botpress.init({
-        configUrl: BOTPRESS_CONFIG_URL,
-        hostUrl: 'https://cdn.botpress.cloud/webchat/v3.5',
-        containerSelector: '#bp-webchat-container',
-        userData: {
-          id: userId
-        },
-        configuration: {
-          variant: 'solid',
-          showPoweredBy: false,
-          showOpenToggle: false,
-          containerWidth: '100%',
-          layoutWidth: '100%'
-        }
+      // Wait for Botpress to be available
+      if (typeof window.botpress === 'undefined') {
+        console.log('Waiting for Botpress to load...');
+        setTimeout(() => initBotpress(userId), 100);
+        return;
+      }
+
+      // Set up event listeners BEFORE init
+      window.botpress.on('webchat:ready', () => {
+        console.log('✅ Botpress webchat ready');
+        botpressLoaded = true;
+        
+        // Open the chat immediately
+        setTimeout(() => {
+          window.botpress.open();
+          console.log('Opened Botpress chat');
+        }, 300);
       });
 
-      botpressLoaded = true;
-      
-      // Open the chat
-      setTimeout(() => {
-        window.botpress.open();
-      }, 500);
+      window.botpress.on('webchat:opened', () => {
+        console.log('✅ Botpress webchat opened');
+      });
+
+      // Initialize Botpress
+      try {
+        window.botpress.init({
+          botId: BOT_ID,
+          clientId: CLIENT_ID,
+          hostUrl: 'https://cdn.botpress.cloud/webchat/v3.3',
+          containerSelector: '#bp-webchat-container',
+          userData: {
+            id: userId
+          },
+          configuration: {
+            variant: 'solid',
+            showPoweredBy: false,
+            showCloseButton: false,
+            containerWidth: '100%',
+            layoutWidth: '100%',
+            themeMode: 'light',
+            botName: 'Alo',
+            botDescription: 'Your therapeutic companion',
+            composerPlaceholder: 'Share what\'s on your mind...',
+            color: '#8B9A7D'
+          }
+        });
+        
+        console.log('✅ Botpress init called successfully');
+      } catch (error) {
+        console.error('❌ Error initializing Botpress:', error);
+      }
     }
 
     function disconnect() {
