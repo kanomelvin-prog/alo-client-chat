@@ -18,11 +18,15 @@
       --border: rgba(156, 149, 137, 0.2);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
 
     html, body {
       height: 100%;
-      overflow: hidden;
+      /* NO overflow: hidden on body - let flex handle it */
     }
 
     body {
@@ -31,6 +35,7 @@
       color: var(--charcoal);
     }
 
+    /* CRITICAL: Proper flex container */
     .page-container {
       display: flex;
       flex-direction: column;
@@ -41,7 +46,7 @@
       box-shadow: 0 0 40px rgba(0,0,0,0.05);
     }
 
-    /* Header */
+    /* Header - fixed size */
     .connected-header {
       background: var(--sage);
       color: white;
@@ -51,7 +56,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-shrink: 0;
+      flex-shrink: 0; /* Don't let header shrink */
     }
 
     .status {
@@ -94,33 +99,28 @@
       background: rgba(255,255,255,0.3);
     }
 
-    /* CRITICAL FIX #1: Explicit height for chat container */
+    /* CRITICAL FIX: min-height: 0 allows flex child to shrink */
     .chat-area {
       flex: 1;
+      min-height: 0; /* KEY: prevents blowout */
       display: flex;
       flex-direction: column;
-      height: 100%; /* Explicit height */
-      min-height: 500px; /* Prevent collapse */
       position: relative;
       overflow: hidden;
     }
 
-    /* CRITICAL FIX #2: Container where Botpress will mount */
+    /* CRITICAL FIX: Container with min-height: 0 */
     #bp-webchat-container {
       flex: 1;
+      min-height: 0; /* KEY: prevents blowout */
       width: 100%;
-      height: 100%; /* Explicit height */
-      min-height: 100%;
-      position: relative; /* Parent is relative */
+      position: relative;
     }
 
-    /* CRITICAL FIX #3: Force Botpress to fill container absolutely */
+    /* CRITICAL FIX: Absolute positioning for Botpress */
     .bpWebchat {
       position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
+      inset: 0 !important; /* top, right, bottom, left all 0 */
       width: 100% !important;
       height: 100% !important;
       max-height: 100% !important;
@@ -128,10 +128,10 @@
       box-shadow: none !important;
     }
 
-    /* CRITICAL FIX #4: Force any iframe to fill */
+    /* Force iframe to fill */
     #bp-webchat-container iframe {
-      height: 100% !important;
       width: 100% !important;
+      height: 100% !important;
       border: none !important;
       display: block !important;
     }
@@ -143,7 +143,7 @@
       display: none !important;
     }
 
-    /* Hide Botpress header (we have our own) */
+    /* Hide Botpress internal header */
     .bpHeaderContainer {
       display: none !important;
     }
@@ -206,9 +206,8 @@
         <div class="loading-text">Connecting to Alo...</div>
       </div>
 
-      <!-- CRITICAL: Botpress container with inject.js INSIDE -->
+      <!-- Botpress container with script tag inside -->
       <div id="bp-webchat-container">
-        <!-- CRITICAL FIX #5: Script tag INSIDE the container -->
         <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
       </div>
     </div>
@@ -231,19 +230,14 @@
       document.getElementById('loadingOverlay').classList.remove('hidden');
     }
 
-    // CRITICAL FIX #6: Use webchat:initialized event (not webchat:ready)
+    // Initialize Botpress
     function initBotpress(userId) {
       console.log('🚀 Initializing Botpress for user:', userId);
 
-      // If already initialized, just update user and open
+      // If already initialized, just restart and open
       if (window.botpress?._aloInitialized) {
-        console.log('✅ Already initialized, just opening...');
-        try {
-          window.botpress.updateUser?.({ id: userId });
-          window.botpress.open();
-        } catch (e) {
-          console.error('Error updating user:', e);
-        }
+        console.log('✅ Already initialized, restarting conversation...');
+        restartAndOpen();
         return;
       }
 
@@ -257,12 +251,19 @@
       console.log('✅ Botpress loaded, setting up events...');
 
       // Listen for initialization
-      window.botpress.on('webchat:initialized', () => {
+      window.botpress.on('webchat:initialized', async () => {
         console.log('✅ Webchat initialized');
         window.botpress._aloInitialized = true;
         hideLoading();
         
-        // Auto-open the chat
+        // CRITICAL FIX: Start fresh conversation, then open
+        try {
+          await window.botpress.restartConversation();
+          console.log('🔄 Conversation restarted (fresh start)');
+        } catch (e) {
+          console.warn('Could not restart conversation:', e);
+        }
+        
         window.botpress.open();
       });
 
@@ -280,6 +281,10 @@
       window.botpress.init({
         botId: BOT_ID,
         clientId: CLIENT_ID,
+        
+        // CRITICAL FIX: Use containerSelector to keep chat contained
+        containerSelector: '#bp-webchat-container',
+        
         userData: { 
           id: userId,
           name: userId 
@@ -294,13 +299,27 @@
           composerPlaceholder: "Share what's on your mind...",
           color: '#8B9A7D',
           variant: 'soft',
-          fontFamily: 'Inter'
+          fontFamily: 'Inter',
+          
+          // CRITICAL FIX: Use sessionStorage for fresh conversations per tab
+          useSessionStorage: true
         }
       });
     }
 
-    // CRITICAL FIX #7: Delay initialization until DOM is painted
-    // Use requestAnimationFrame to ensure layout is complete
+    // Helper function to restart and open
+    async function restartAndOpen() {
+      try {
+        await window.botpress.restartConversation();
+        console.log('🔄 Conversation restarted');
+        window.botpress.open();
+      } catch (e) {
+        console.error('Error restarting conversation:', e);
+        window.botpress.open();
+      }
+    }
+
+    // Delay initialization until DOM is painted
     window.addEventListener('load', () => {
       console.log('📄 Page loaded');
       
@@ -312,14 +331,18 @@
       });
     });
 
-    // New chat function
-    function newChat() {
-      if (confirm('Start a new conversation? Your current chat will be saved.')) {
-        // In production, this would create a new conversation ID
-        window.botpress?.close();
-        setTimeout(() => {
-          window.botpress?.open();
-        }, 200);
+    // New chat function - restart conversation
+    async function newChat() {
+      if (confirm('Start a new conversation? Your current chat will be cleared.')) {
+        showLoading();
+        try {
+          await window.botpress.restartConversation();
+          console.log('🔄 New conversation started');
+          window.botpress.open();
+        } catch (e) {
+          console.error('Error starting new chat:', e);
+        }
+        hideLoading();
       }
     }
 
@@ -327,6 +350,15 @@
     function logout() {
       if (confirm('Are you sure you want to logout?')) {
         localStorage.removeItem('aloClientCode');
+        
+        // Clear session storage to fully reset
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const key = sessionStorage.key(i);
+          if (key && (key.includes('bp') || key.includes('botpress'))) {
+            sessionStorage.removeItem(key);
+          }
+        }
+        
         window.location.reload();
       }
     }
@@ -339,7 +371,8 @@
       
       const container = document.getElementById('bp-webchat-container');
       console.log('Container element:', container);
-      console.log('Container children:', container?.children.length);
+      console.log('Container offsetHeight:', container?.offsetHeight);
+      console.log('Container offsetWidth:', container?.offsetWidth);
       
       const webchat = document.querySelector('.bpWebchat');
       console.log('.bpWebchat found:', !!webchat);
@@ -349,15 +382,18 @@
         console.log('Webchat position:', styles.position);
         console.log('Webchat width:', styles.width);
         console.log('Webchat height:', styles.height);
-        console.log('Webchat display:', styles.display);
+        console.log('Webchat top:', styles.top);
       }
       
       const iframe = document.querySelector('#bp-webchat-container iframe');
       console.log('Iframe found:', !!iframe);
       if (iframe) {
-        console.log('Iframe width:', iframe.offsetWidth);
-        console.log('Iframe height:', iframe.offsetHeight);
+        console.log('Iframe offsetWidth:', iframe.offsetWidth);
+        console.log('Iframe offsetHeight:', iframe.offsetHeight);
       }
+      
+      const chatArea = document.querySelector('.chat-area');
+      console.log('Chat area offsetHeight:', chatArea?.offsetHeight);
       
       console.log('===================');
     };
