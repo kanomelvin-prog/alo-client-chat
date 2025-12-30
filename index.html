@@ -649,7 +649,8 @@
       console.log('Database URL:', SUPABASE_URL);
       
       try {
-        const url = `${SUPABASE_URL}/rest/v1/homework?client_code=eq.${clientCode}&active=eq.true&order=created_at.desc`;
+        // Load ALL active homework, then filter client-side (case-insensitive)
+        const url = `${SUPABASE_URL}/rest/v1/homework?active=eq.true&order=created_at.desc`;
         console.log('🔗 Query URL:', url);
         
         const response = await fetch(url, {
@@ -668,15 +669,19 @@
           throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
-        const data = await response.json();
-        console.log('📦 Homework query result:', { 
-          client_code: clientCode,
-          found: data?.length || 0,
-          data: data
-        });
+        const allHomework = await response.json();
+        console.log('📦 Total homework items:', allHomework?.length);
+        console.log('All client codes in homework:', [...new Set(allHomework?.map(h => h.client_code))]);
         
-        console.log(`✅ Found ${data?.length || 0} homework items`);
-        renderHomework(data || []);
+        // Filter to current client (case-insensitive)
+        const data = allHomework?.filter(h => 
+          h.client_code.toLowerCase() === clientCode.toLowerCase()
+        ) || [];
+        
+        console.log('📦 Filtered homework for', clientCode, ':', data.length, 'items');
+        console.log('Matching homework:', data);
+        
+        renderHomework(data);
       } catch (error) {
         console.error('💥 Error loading homework:', error);
         alert(`Error loading homework: ${error.message}`);
@@ -772,7 +777,8 @@
       console.log('Client Code:', clientCode);
       
       try {
-        const url = `${SUPABASE_URL}/rest/v1/client_messages?client_code=eq.${clientCode}&order=created_at.desc&limit=5`;
+        // Load ALL messages, then filter client-side (case-insensitive)
+        const url = `${SUPABASE_URL}/rest/v1/client_messages?order=created_at.desc&limit=100`;
         console.log('🔗 Query URL:', url);
         
         const response = await fetch(url, {
@@ -790,12 +796,17 @@
           throw new Error(`HTTP ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log('📨 Messages result:', {
-          client_code: clientCode,
-          found: data?.length || 0,
-          data: data
-        });
+        const allMessages = await response.json();
+        console.log('📦 Total messages:', allMessages?.length);
+        console.log('All client codes in messages:', [...new Set(allMessages?.map(m => m.client_code))]);
+        
+        // Filter to current client (case-insensitive)
+        const data = allMessages?.filter(m => 
+          m.client_code.toLowerCase() === clientCode.toLowerCase()
+        ).slice(0, 5) || [];
+        
+        console.log('📨 Filtered messages for', clientCode, ':', data.length);
+        console.log('Matching messages:', data);
 
         const container = document.getElementById('sentMessagesList');
         
