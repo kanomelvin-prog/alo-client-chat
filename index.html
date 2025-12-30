@@ -575,9 +575,27 @@
     
     // Guest chat function
     function startGuestChat() {
-      // Just open the Botpress chat
-      if (window.botpress && window.botpress.open) {
-        window.botpress.open();
+      if (window.botpress) {
+        // Clear Botpress conversation storage to start fresh
+        // This removes the stored conversation ID and history
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('bp-') || key.includes('botpress') || key.includes('webchat')) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        // Small delay to ensure storage is cleared
+        setTimeout(() => {
+          // Reinitialize Botpress to start fresh
+          initBotpress();
+          
+          // Open the chat after reinit
+          setTimeout(() => {
+            if (window.botpress && window.botpress.open) {
+              window.botpress.open();
+            }
+          }, 500);
+        }, 100);
       } else {
         alert('Chat is loading... please try again in a moment.');
       }
