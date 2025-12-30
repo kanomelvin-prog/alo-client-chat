@@ -239,15 +239,15 @@
       position: relative;
       background: var(--warm-white);
       overflow: hidden;
-      padding: 3%;
+      padding: 9%;
     }
     
     #chatContainer {
       position: absolute;
-      top: 3%;
-      left: 3%;
-      right: 3%;
-      bottom: 3%;
+      top: 9%;
+      left: 9%;
+      right: 9%;
+      bottom: 9%;
       background: white;
       border-radius: 12px;
       overflow: hidden;
@@ -717,10 +717,8 @@
     }
 
     function disconnect() {
-      if (confirm('Disconnect and return to login?')) {
-        localStorage.removeItem('aloClientCode');
-        window.location.reload();
-      }
+      localStorage.removeItem('aloClientCode');
+      window.location.reload();
     }
   </script>
 
