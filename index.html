@@ -3,43 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alo Chat - Basic Working</title>
+  <title>Alo - Your Thinking Partner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --cream: #FDFBF7;
+      --warm-white: #FAF8F5;
+      --sage: #8B9A7D;
+      --sage-light: #E8EDE4;
+      --charcoal: #2D2A26;
+      --stone: #9C9589;
+      --border: rgba(156, 149, 137, 0.2);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
+    
     body {
-      font-family: Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
+      min-height: 100vh;
     }
-
-    /* Simple header */
+    
+    /* Two states: welcome (not connected) and connected (chat mode) */
+    .welcome-view {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .connected-view {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+    }
+    
+    /* Header Section */
     .header {
-      background: #8B9A7D;
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: var(--sage);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
       color: white;
-      padding: 15px 20px;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    h1 {
+      color: var(--charcoal);
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .tagline {
+      color: var(--stone);
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+    
+    /* Client Connection Card */
+    .connection-card {
+      background: var(--sage-light);
+      border: 1px solid var(--sage);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--stone);
+      border-radius: 50%;
+    }
+    
+    .status-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    
+    .client-code-input {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .client-code-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .client-code-input button {
+      padding: 12px 24px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .client-code-input button:hover {
+      background: #7a8a6d;
+    }
+    
+    /* Info Card */
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .info-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+    
+    .info-card p {
+      font-size: 14px;
+      color: var(--stone);
+      line-height: 1.6;
+    }
+    
+    /* Connected Mode */
+    .connected-header {
+      background: var(--sage);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       flex-shrink: 0;
     }
-
-    .header h1 {
-      font-size: 20px;
-      font-weight: 500;
+    
+    .connected-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
-    /* Chat area */
+    
+    .connected-dot {
+      width: 8px;
+      height: 8px;
+      background: #90EE90;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .header-btn {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .header-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    /* Chat Container */
     .chat-container {
       flex: 1;
       position: relative;
       background: white;
       overflow: hidden;
     }
-
+    
     #chatArea {
       position: absolute;
       top: 0;
@@ -47,13 +224,13 @@
       right: 0;
       bottom: 0;
     }
-
-    /* Hide the floating button */
+    
+    /* Hide Botpress floating button */
     .bpFab {
       display: none !important;
     }
-
-    /* Make webchat fill the container */
+    
+    /* Make webchat fill container */
     .bpWebchat {
       position: absolute !important;
       top: 0 !important;
@@ -66,32 +243,141 @@
       border-radius: 0 !important;
       box-shadow: none !important;
     }
-
-    /* Hide Botpress header */
+    
+    /* Hide Botpress internal header */
     .bpHeaderContainer {
       display: none !important;
     }
-
-    /* Loading indicator */
-    .loading {
+    
+    /* Loading state */
+    .loading-overlay {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: #8B9A7D;
-      font-size: 16px;
+      text-align: center;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--sage-light);
+      border-top-color: var(--sage);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: var(--stone);
+      font-size: 14px;
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      color: var(--stone);
+      font-size: 12px;
+    }
+    
+    .footer a {
+      color: var(--sage);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>Talk to Alo</h1>
+  <!-- Welcome View (Not Connected) -->
+  <div class="welcome-view" id="welcomeView">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">A</div>
+      <h1>Alo</h1>
+      <p class="tagline">Your thinking partner between therapy sessions</p>
+    </div>
+    
+    <!-- Client Connection -->
+    <div class="connection-card">
+      <div class="connection-status">
+        <div class="status-dot"></div>
+        <div class="status-text">Enter your client code to connect</div>
+      </div>
+      
+      <div class="client-code-input">
+        <input 
+          type="text" 
+          id="clientCodeField" 
+          placeholder="Enter your client code (e.g., SARAH-001)"
+          autocomplete="off"
+          onkeypress="if(event.key==='Enter') connectClient()"
+        >
+        <button onclick="connectClient()">Connect</button>
+      </div>
+    </div>
+    
+    <!-- Info Card -->
+    <div class="info-card">
+      <h2>💬 What is Alo?</h2>
+      <p>
+        Alo is your AI thinking partner, designed to help you process emotions and navigate 
+        difficult moments between therapy sessions. Think of it as a safe space to explore 
+        your thoughts, work through feelings, and gain clarity.
+      </p>
+    </div>
+    
+    <div class="info-card">
+      <h2>🔒 Privacy & Security</h2>
+      <p>
+        Your conversations with Alo are private and confidential. Your therapist can only 
+        see what you choose to share with them. Alo complements your therapy work but does 
+        not replace professional mental health care.
+      </p>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      Built with care by <a href="https://withalo.me" target="_blank">Alo</a> • 
+      <a href="#">Privacy</a> • 
+      <a href="#">Terms</a>
+    </div>
+    
   </div>
 
-  <div class="chat-container">
-    <div class="loading" id="loading">Loading chat...</div>
-    <div id="chatArea"></div>
+  <!-- Connected View (Chat Mode) -->
+  <div class="connected-view" id="connectedView">
+    
+    <!-- Header -->
+    <div class="connected-header">
+      <div class="connected-header-left">
+        <div class="connected-dot"></div>
+        <span>Connected as <strong id="connectedCode">DEMO-001</strong></span>
+      </div>
+      <div>
+        <button class="header-btn" onclick="newChat()">New Chat</button>
+        <button class="header-btn" onclick="disconnect()">Disconnect</button>
+      </div>
+    </div>
+    
+    <!-- Chat Container -->
+    <div class="chat-container">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Connecting to Alo...</div>
+      </div>
+      <div id="chatArea"></div>
+    </div>
+    
   </div>
 
   <!-- Load Botpress -->
@@ -100,10 +386,57 @@
   <script>
     const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
     const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
+    
+    let clientCode = localStorage.getItem('aloClientCode');
+    let botpressInitialized = false;
+
+    // Check if already connected on load
+    if (clientCode) {
+      switchToConnectedView(clientCode);
+    }
+
+    function connectClient() {
+      const input = document.getElementById('clientCodeField');
+      const code = input.value.trim().toUpperCase();
+      
+      if (!code) {
+        alert('Please enter a client code');
+        return;
+      }
+      
+      // Validate format (basic check)
+      if (code.length < 3) {
+        alert('Please enter a valid client code');
+        return;
+      }
+      
+      // Save and connect
+      localStorage.setItem('aloClientCode', code);
+      clientCode = code;
+      
+      switchToConnectedView(code);
+    }
+
+    function switchToConnectedView(code) {
+      // Hide welcome, show connected
+      document.getElementById('welcomeView').style.display = 'none';
+      document.getElementById('connectedView').style.display = 'flex';
+      document.getElementById('connectedCode').textContent = code;
+      
+      // Initialize Botpress
+      setTimeout(() => {
+        initBotpress(code);
+      }, 100);
+    }
 
     function hideLoading() {
-      const loading = document.getElementById('loading');
-      if (loading) loading.style.display = 'none';
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function showLoading() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) overlay.style.display = 'block';
     }
 
     // Move webchat into our container
@@ -116,14 +449,18 @@
           container.appendChild(webchat);
           console.log('✅ Moved webchat into container');
         }
-      } else {
-        console.log('⏳ Waiting for webchat element...');
       }
     }
 
-    function initBotpress() {
+    function initBotpress(userId) {
+      if (botpressInitialized) {
+        console.log('Already initialized');
+        return;
+      }
+
       if (typeof window.botpress === 'undefined') {
-        setTimeout(initBotpress, 100);
+        console.log('⏳ Waiting for Botpress...');
+        setTimeout(() => initBotpress(userId), 100);
         return;
       }
 
@@ -135,12 +472,12 @@
         hideLoading();
         window.botpress.open();
         
-        // Move the webchat element into our container
+        // Move the webchat element
         setTimeout(moveWebchatToContainer, 100);
       });
 
       window.botpress.on('webchat:opened', () => {
-        console.log('💬 Webchat opened');
+        console.log('💬 Chat opened');
         moveWebchatToContainer();
       });
 
@@ -148,32 +485,49 @@
       window.botpress.init({
         botId: BOT_ID,
         clientId: CLIENT_ID,
+        userData: {
+          id: userId,
+          name: userId
+        },
         configuration: {
           color: '#8B9A7D',
           themeMode: 'light',
           botName: 'Alo',
+          botDescription: 'Your thinking partner',
           composerPlaceholder: "What's on your mind?",
           showPoweredBy: false
         }
       });
 
+      botpressInitialized = true;
       console.log('🔧 Botpress init() called');
     }
 
-    // Start when page loads
-    window.addEventListener('load', () => {
-      console.log('📄 Page loaded');
-      initBotpress();
-    });
-
-    // Also try to move webchat periodically (safety net)
+    // Periodically ensure webchat stays in container
     setInterval(() => {
-      const webchat = document.querySelector('.bpWebchat');
-      const container = document.getElementById('chatArea');
-      if (webchat && container && webchat.parentElement !== container) {
+      if (botpressInitialized) {
         moveWebchatToContainer();
       }
-    }, 500);
+    }, 1000);
+
+    function newChat() {
+      if (confirm('Start a new conversation? Your current chat will be saved.')) {
+        // Close and reopen to reset
+        if (window.botpress) {
+          window.botpress.close();
+          setTimeout(() => {
+            window.botpress.open();
+          }, 200);
+        }
+      }
+    }
+
+    function disconnect() {
+      if (confirm('Are you sure you want to disconnect?')) {
+        localStorage.removeItem('aloClientCode');
+        window.location.reload();
+      }
+    }
   </script>
 
 </body>
