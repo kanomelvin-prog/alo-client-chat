@@ -239,15 +239,15 @@
       position: relative;
       background: var(--warm-white);
       overflow: hidden;
-      padding: 20px;
+      padding: 3%;
     }
     
     #chatContainer {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      bottom: 20px;
+      top: 3%;
+      left: 3%;
+      right: 3%;
+      bottom: 3%;
       background: white;
       border-radius: 12px;
       overflow: hidden;
@@ -373,10 +373,10 @@
       <div class="divider">or</div>
       
       <button class="guest-btn" onclick="connectAsGuest()">
-        💬 Try Alo as a Guest
+        🌟 Try Alo Free - No Code Needed
       </button>
       <p class="guest-note">
-        Guest sessions are not saved and do not connect to a therapist.
+        Experience Alo instantly. Perfect for exploring before connecting with your therapist.
       </p>
       
       <p style="font-size: 12px; color: var(--stone); margin-top: 24px;">
@@ -553,8 +553,22 @@
       window.botpress.on('webchat:ready', () => {
         console.log('✅ Webchat ready');
         hideLoading();
-        window.botpress.open();
-        setTimeout(moveWebchatToContainer, 100);
+        
+        // Start with fresh conversation
+        if (window.botpress.restartConversation) {
+          window.botpress.restartConversation().then(() => {
+            console.log('🔄 Started fresh conversation');
+            window.botpress.open();
+            setTimeout(moveWebchatToContainer, 100);
+          }).catch(() => {
+            // If restart fails, just open normally
+            window.botpress.open();
+            setTimeout(moveWebchatToContainer, 100);
+          });
+        } else {
+          window.botpress.open();
+          setTimeout(moveWebchatToContainer, 100);
+        }
       });
 
       window.botpress.on('webchat:opened', () => {
@@ -684,7 +698,18 @@
 
     function newChat() {
       if (confirm('Start a new conversation?')) {
-        if (window.botpress) {
+        if (window.botpress && window.botpress.restartConversation) {
+          window.botpress.restartConversation().then(() => {
+            console.log('🔄 New conversation started');
+            window.botpress.open();
+          }).catch((error) => {
+            console.error('Error restarting conversation:', error);
+            // Fallback to close/open
+            window.botpress.close();
+            setTimeout(() => window.botpress.open(), 200);
+          });
+        } else {
+          // Fallback if restartConversation not available
           window.botpress.close();
           setTimeout(() => window.botpress.open(), 200);
         }
