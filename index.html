@@ -3,406 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alo - Your Thinking Partner</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>Alo Chat - Basic</title>
   <style>
-    :root {
-      --cream: #FDFBF7;
-      --warm-white: #FAF8F5;
-      --stone: #9C9589;
-      --charcoal: #2D2A26;
-      --sage: #8B9A7D;
-      --sage-light: #E8EDE4;
-      --border: rgba(156, 149, 137, 0.2);
-    }
-
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
-
-    html, body {
-      height: 100%;
-      /* NO overflow: hidden on body - let flex handle it */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--cream);
-      color: var(--charcoal);
-    }
-
-    /* CRITICAL: Proper flex container */
-    .page-container {
-      display: flex;
-      flex-direction: column;
+      font-family: Arial, sans-serif;
       height: 100vh;
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--warm-white);
-      box-shadow: 0 0 40px rgba(0,0,0,0.05);
-    }
-
-    /* Header - fixed size */
-    .connected-header {
-      background: var(--sage);
-      color: white;
-      padding: 12px 20px;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0; /* Don't let header shrink */
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .status::before {
-      content: '';
-      width: 8px;
-      height: 8px;
-      background: #90EE90;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .header-btn {
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      color: white;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-    }
-
-    .header-btn:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    /* CRITICAL FIX: min-height: 0 allows flex child to shrink */
-    .chat-area {
-      flex: 1;
-      min-height: 0; /* KEY: prevents blowout */
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow: hidden;
     }
 
-    /* CRITICAL FIX: Container with min-height: 0 */
-    #bp-webchat-container {
+    /* Simple header */
+    .header {
+      background: #8B9A7D;
+      color: white;
+      padding: 15px 20px;
+      flex-shrink: 0;
+    }
+
+    /* Chat area - this is where Botpress goes */
+    .chat-container {
       flex: 1;
-      min-height: 0; /* KEY: prevents blowout */
-      width: 100%;
       position: relative;
+      background: #f5f5f5;
     }
 
-    /* CRITICAL FIX: Absolute positioning for Botpress */
-    .bpWebchat {
-      position: absolute !important;
-      inset: 0 !important; /* top, right, bottom, left all 0 */
-      width: 100% !important;
-      height: 100% !important;
-      max-height: 100% !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-    }
-
-    /* Force iframe to fill */
-    #bp-webchat-container iframe {
-      width: 100% !important;
-      height: 100% !important;
-      border: none !important;
-      display: block !important;
-    }
-
-    /* Hide floating action button */
-    .bpFab,
-    .bpFabButton,
-    [class*="bpFab"] {
-      display: none !important;
-    }
-
-    /* Hide Botpress internal header */
-    .bpHeaderContainer {
-      display: none !important;
-    }
-
-    /* Loading overlay */
-    .loading-overlay {
+    /* Make sure Botpress fills the space */
+    #botpress-chat {
       position: absolute;
-      inset: 0;
-      background: var(--warm-white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 10;
-    }
-
-    .loading-overlay.hidden {
-      display: none;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--sage-light);
-      border-top-color: var(--sage);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      color: var(--stone);
-      font-size: 14px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  
-  <div class="page-container">
-    <!-- Header -->
-    <div class="connected-header">
-      <div class="status">
-        <span>Connected as <strong id="clientName">Loading...</strong></span>
-      </div>
-      <div class="header-actions">
-        <button class="header-btn" onclick="newChat()">New Chat</button>
-        <button class="header-btn" onclick="logout()">Logout</button>
-      </div>
-    </div>
 
-    <!-- Chat Area -->
-    <div class="chat-area">
-      <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner"></div>
-        <div class="loading-text">Connecting to Alo...</div>
-      </div>
+  <div class="header">
+    <h1>Talk to Alo</h1>
+  </div>
 
-      <!-- Botpress container with script tag inside -->
-      <div id="bp-webchat-container">
-        <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
-      </div>
+  <div class="chat-container">
+    <div id="botpress-chat">
+      <!-- Botpress will load here -->
     </div>
   </div>
 
-  <!-- Configuration & Initialization -->
+  <!-- Load Botpress -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+  
   <script>
-    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
-    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
-
-    // Get client code from localStorage or URL
-    let clientCode = localStorage.getItem('aloClientCode') || 'DEMO-001';
-    document.getElementById('clientName').textContent = clientCode;
-
-    function hideLoading() {
-      document.getElementById('loadingOverlay').classList.add('hidden');
-    }
-
-    function showLoading() {
-      document.getElementById('loadingOverlay').classList.remove('hidden');
-    }
-
-    // Initialize Botpress
-    function initBotpress(userId) {
-      console.log('🚀 Initializing Botpress for user:', userId);
-
-      // If already initialized, just restart and open
-      if (window.botpress?._aloInitialized) {
-        console.log('✅ Already initialized, restarting conversation...');
-        restartAndOpen();
-        return;
-      }
-
-      // Wait for inject.js to expose window.botpress
+    // Wait for Botpress to load
+    function initChat() {
       if (!window.botpress) {
-        console.log('⏳ Waiting for Botpress to load...');
-        setTimeout(() => initBotpress(userId), 50);
+        setTimeout(initChat, 100);
         return;
       }
 
-      console.log('✅ Botpress loaded, setting up events...');
+      console.log('Botpress loaded, initializing...');
 
-      // Listen for initialization
-      window.botpress.on('webchat:initialized', async () => {
-        console.log('✅ Webchat initialized');
-        window.botpress._aloInitialized = true;
-        hideLoading();
-        
-        // CRITICAL FIX: Start fresh conversation, then open
-        try {
-          await window.botpress.restartConversation();
-          console.log('🔄 Conversation restarted (fresh start)');
-        } catch (e) {
-          console.warn('Could not restart conversation:', e);
-        }
-        
-        window.botpress.open();
-      });
-
-      // Listen for open/close
-      window.botpress.on('webchat:opened', () => {
-        console.log('💬 Chat opened');
-      });
-
-      window.botpress.on('webchat:closed', () => {
-        console.log('Chat closed');
-      });
-
-      // Initialize with configuration
-      console.log('🔧 Calling botpress.init()...');
+      // Initialize
       window.botpress.init({
-        botId: BOT_ID,
-        clientId: CLIENT_ID,
-        
-        // CRITICAL FIX: Use containerSelector to keep chat contained
-        containerSelector: '#bp-webchat-container',
-        
-        userData: { 
-          id: userId,
-          name: userId 
-        },
+        botId: 'fc0fad71-daea-4d22-adf5-3a659042d46a',
+        clientId: 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e',
+        containerSelector: '#botpress-chat',
         configuration: {
-          showPoweredBy: false,
-          showCloseButton: false,
-          showConversationListButton: false,
-          themeMode: 'light',
           botName: 'Alo',
-          botDescription: 'Your thinking partner',
-          composerPlaceholder: "Share what's on your mind...",
-          color: '#8B9A7D',
-          variant: 'soft',
-          fontFamily: 'Inter',
-          
-          // CRITICAL FIX: Use sessionStorage for fresh conversations per tab
-          useSessionStorage: true
+          composerPlaceholder: "What's on your mind?",
+          showPoweredBy: false
         }
+      });
+
+      // Open when ready
+      window.botpress.on('webchat:initialized', () => {
+        console.log('Chat initialized, opening...');
+        window.botpress.open();
       });
     }
 
-    // Helper function to restart and open
-    async function restartAndOpen() {
-      try {
-        await window.botpress.restartConversation();
-        console.log('🔄 Conversation restarted');
-        window.botpress.open();
-      } catch (e) {
-        console.error('Error restarting conversation:', e);
-        window.botpress.open();
-      }
-    }
-
-    // Delay initialization until DOM is painted
-    window.addEventListener('load', () => {
-      console.log('📄 Page loaded');
-      
-      // Wait for layout to complete before initializing
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          initBotpress(clientCode);
-        }, 100);
-      });
-    });
-
-    // New chat function - restart conversation
-    async function newChat() {
-      if (confirm('Start a new conversation? Your current chat will be cleared.')) {
-        showLoading();
-        try {
-          await window.botpress.restartConversation();
-          console.log('🔄 New conversation started');
-          window.botpress.open();
-        } catch (e) {
-          console.error('Error starting new chat:', e);
-        }
-        hideLoading();
-      }
-    }
-
-    // Logout function
-    function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        localStorage.removeItem('aloClientCode');
-        
-        // Clear session storage to fully reset
-        for (let i = sessionStorage.length - 1; i >= 0; i--) {
-          const key = sessionStorage.key(i);
-          if (key && (key.includes('bp') || key.includes('botpress'))) {
-            sessionStorage.removeItem(key);
-          }
-        }
-        
-        window.location.reload();
-      }
-    }
-
-    // Debug helper
-    window.debugBotpress = function() {
-      console.log('=== BOTPRESS DEBUG ===');
-      console.log('window.botpress exists:', !!window.botpress);
-      console.log('botpress._aloInitialized:', window.botpress?._aloInitialized);
-      
-      const container = document.getElementById('bp-webchat-container');
-      console.log('Container element:', container);
-      console.log('Container offsetHeight:', container?.offsetHeight);
-      console.log('Container offsetWidth:', container?.offsetWidth);
-      
-      const webchat = document.querySelector('.bpWebchat');
-      console.log('.bpWebchat found:', !!webchat);
-      
-      if (webchat) {
-        const styles = window.getComputedStyle(webchat);
-        console.log('Webchat position:', styles.position);
-        console.log('Webchat width:', styles.width);
-        console.log('Webchat height:', styles.height);
-        console.log('Webchat top:', styles.top);
-      }
-      
-      const iframe = document.querySelector('#bp-webchat-container iframe');
-      console.log('Iframe found:', !!iframe);
-      if (iframe) {
-        console.log('Iframe offsetWidth:', iframe.offsetWidth);
-        console.log('Iframe offsetHeight:', iframe.offsetHeight);
-      }
-      
-      const chatArea = document.querySelector('.chat-area');
-      console.log('Chat area offsetHeight:', chatArea?.offsetHeight);
-      
-      console.log('===================');
-    };
-
-    // Auto-run debug after 3 seconds
-    setTimeout(() => {
-      console.log('🔍 Auto-running debug...');
-      window.debugBotpress();
-    }, 3000);
+    // Start
+    window.addEventListener('load', initChat);
   </script>
 
 </body>
