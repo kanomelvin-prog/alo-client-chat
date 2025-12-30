@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Alo - Your Thinking Partner</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -395,6 +398,186 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    
+    /* ========================================
+       MOBILE OPTIMIZATION
+       ======================================== */
+    @media (max-width: 768px) {
+      /* Welcome screen mobile */
+      .welcome-card {
+        padding: 32px 24px;
+        margin: 16px;
+      }
+      
+      .logo {
+        width: 64px;
+        height: 64px;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      .tagline {
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      input, button {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      
+      .guest-btn {
+        padding: 16px;
+        font-size: 16px;
+      }
+      
+      /* Chat view mobile */
+      .chat-view {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
+      
+      .sidebar {
+        display: none; /* Hide sidebar on mobile */
+      }
+      
+      .chat-header {
+        padding: 16px;
+        border-radius: 0;
+      }
+      
+      .status-text {
+        font-size: 12px;
+      }
+      
+      .new-chat-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      
+      .chat-container {
+        padding: 16px;
+      }
+      
+      .message {
+        max-width: 85%;
+      }
+      
+      .user-message {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .bot-message {
+        padding: 12px 16px;
+        font-size: 15px;
+      }
+      
+      .chat-input {
+        padding: 16px;
+        gap: 8px;
+        border-radius: 0;
+      }
+      
+      #messageInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+      }
+      
+      .send-btn {
+        width: 48px;
+        height: 48px;
+        padding: 12px;
+      }
+      
+      /* Note panel mobile - make it a bottom sheet */
+      .note-panel {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 70vh;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      
+      .note-header {
+        padding: 20px 16px 16px;
+        border-radius: 20px 20px 0 0;
+      }
+      
+      .note-content {
+        padding: 16px;
+      }
+      
+      #noteTextarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        min-height: 200px;
+      }
+      
+      .note-footer {
+        padding: 16px;
+      }
+      
+      /* Disconnect modal mobile */
+      .modal-content {
+        margin: 16px;
+        padding: 24px;
+        max-width: calc(100% - 32px);
+      }
+      
+      /* Mobile-specific improvements */
+      body.mobile-view {
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Prevent zoom on input focus for iOS */
+      input[type="text"],
+      textarea {
+        font-size: 16px !important;
+      }
+      
+      /* Better touch targets */
+      button, .clickable {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      
+      /* Hide scrollbar on mobile for cleaner look */
+      .chat-messages::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    
+    /* Small phones */
+    @media (max-width: 375px) {
+      .welcome-card {
+        padding: 24px 16px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .logo {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -507,6 +690,15 @@
   <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
   
   <script>
+    // Mobile Detection
+    const isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|Windows Phone/i.test(navigator.userAgent) 
+                     || window.innerWidth <= 768;
+    
+    if (isMobile) {
+      document.body.classList.add('mobile-view');
+      console.log('📱 Mobile device detected - optimized layout loaded');
+    }
+    
     // Configuration
     const SUPABASE_URL = 'https://lelsdezstbnzyxvsvbyx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbHNkZXpzdGJuenl4dnN2Ynl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MDk1NDUsImV4cCI6MjA3OTE4NTU0NX0.mm1POxfEEoRXyTF08NsUZOau6qA_UdZJnoUH_5bkQas';
