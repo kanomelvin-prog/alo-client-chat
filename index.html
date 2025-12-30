@@ -644,38 +644,50 @@
 
     // Homework Functions
     async function loadHomework() {
-      console.log('🔍 Loading homework for client:', clientCode);
+      console.log('🔍 === LOADING HOMEWORK ===');
+      console.log('Client Code:', clientCode);
+      console.log('Database URL:', SUPABASE_URL);
       
       try {
-        const { data, error } = await db
-          .from('homework')
-          .select('*')
-          .eq('client_code', clientCode) // Use exact case from input
-          .eq('active', true)
-          .order('created_at', { ascending: false });
+        const url = `${SUPABASE_URL}/rest/v1/homework?client_code=eq.${clientCode}&active=eq.true&order=created_at.desc`;
+        console.log('🔗 Query URL:', url);
+        
+        const response = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          }
+        });
 
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
         console.log('📦 Homework query result:', { 
           client_code: clientCode,
           found: data?.length || 0,
-          data: data,
-          error: error 
+          data: data
         });
-        
-        if (error) {
-          console.error('❌ Homework error:', error);
-          throw error;
-        }
         
         console.log(`✅ Found ${data?.length || 0} homework items`);
         renderHomework(data || []);
       } catch (error) {
         console.error('💥 Error loading homework:', error);
+        alert(`Error loading homework: ${error.message}`);
         renderHomework([]);
       }
     }
 
     function renderHomework(homework) {
       const container = document.getElementById('homeworkList');
+      
+      console.log('🎨 Rendering homework:', homework.length, 'items');
       
       if (!homework.length) {
         container.innerHTML = '<div class="homework-empty">No homework assigned</div>';
@@ -688,6 +700,8 @@
           <div class="homework-desc">${hw.description || ''}</div>
         </div>
       `).join('');
+      
+      console.log('✅ Homework rendered successfully');
     }
 
     // Notes Functions
@@ -695,7 +709,10 @@
       const textarea = document.getElementById('notesTextarea');
       const message = textarea.value.trim();
       
-      console.log('📝 Sending note for client:', clientCode);
+      console.log('📝 === SENDING NOTE ===');
+      console.log('Client Code:', clientCode);
+      console.log('Message:', message);
+      console.log('Database URL:', SUPABASE_URL);
       
       if (!message) {
         alert('Please write a note first');
@@ -703,21 +720,35 @@
       }
 
       try {
-        const { error } = await db
-          .from('client_messages')
-          .insert({
-            client_code: clientCode, // Use exact case
-            message: message,
-            created_at: new Date().toISOString()
-          });
-
-        console.log('📤 Note send result:', { 
+        const payload = {
           client_code: clientCode,
-          success: !error,
-          error: error 
+          message: message,
+          created_at: new Date().toISOString()
+        };
+        
+        console.log('📤 Sending payload:', payload);
+        
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/client_messages`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
         });
 
-        if (error) throw error;
+        console.log('📥 Response status:', response.status);
+        console.log('📥 Response ok:', response.ok);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        console.log('✅ Note sent successfully!');
 
         // Show success
         const saved = document.getElementById('notesSaved');
@@ -728,32 +759,43 @@
         textarea.value = '';
 
         // Reload messages
-        loadSentMessages();
-        console.log('✅ Note sent successfully');
+        await loadSentMessages();
+        
       } catch (error) {
         console.error('💥 Error sending note:', error);
-        alert('Error sending note. Please try again.');
+        alert(`Error sending note: ${error.message}`);
       }
     }
 
     async function loadSentMessages() {
-      console.log('📬 Loading sent messages for:', clientCode);
+      console.log('📬 === LOADING SENT MESSAGES ===');
+      console.log('Client Code:', clientCode);
       
       try {
-        const { data, error } = await db
-          .from('client_messages')
-          .select('*')
-          .eq('client_code', clientCode) // Use exact case
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const url = `${SUPABASE_URL}/rest/v1/client_messages?client_code=eq.${clientCode}&order=created_at.desc&limit=5`;
+        console.log('🔗 Query URL:', url);
+        
+        const response = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          }
+        });
 
+        console.log('📥 Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
         console.log('📨 Messages result:', {
           client_code: clientCode,
           found: data?.length || 0,
-          error: error
+          data: data
         });
-
-        if (error) throw error;
 
         const container = document.getElementById('sentMessagesList');
         
