@@ -443,12 +443,81 @@
       
       /* Chat view mobile */
       .chat-view {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+      
+      .chat-header {
+        order: 1;
+        padding: 16px;
+        border-radius: 0;
+      }
+      
+      .chat-container {
+        order: 2;
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+      }
+      
+      .chat-input {
+        order: 3;
+        padding: 16px;
+        gap: 8px;
+        border-radius: 0;
       }
       
       .sidebar {
-        display: none; /* Hide sidebar on mobile */
+        order: 4;
+        position: relative;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        max-height: none;
+        overflow-y: visible;
+      }
+      
+      /* Collapsible sections on mobile */
+      .sidebar-section {
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .sidebar-section:last-child {
+        border-bottom: none;
+      }
+      
+      /* Make homework and notes compact on mobile by default */
+      .sidebar-section h3 {
+        cursor: pointer;
+        user-select: none;
+        padding: 16px;
+        margin: 0;
+        background: var(--warm-white);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .sidebar-section h3::after {
+        content: '▼';
+        font-size: 12px;
+        transition: transform 0.3s;
+      }
+      
+      .sidebar-section.collapsed h3::after {
+        transform: rotate(-90deg);
+      }
+      
+      .sidebar-section.collapsed .homework-list,
+      .sidebar-section.collapsed .note-form,
+      .sidebar-section.collapsed .sent-messages {
+        display: none;
+      }
+      
+      .homework-list,
+      .note-form,
+      .sent-messages {
+        padding: 12px;
       }
       
       .chat-header {
@@ -646,35 +715,37 @@
       </div>
 
       <!-- Right Sidebar (Stacked: Homework + Notes) -->
-      <div class="right-sidebar" id="rightSidebar">
+      <div class="right-sidebar sidebar" id="rightSidebar">
         
         <!-- Homework Section (Top) -->
-        <div class="homework-section">
+        <div class="sidebar-section homework-section" id="homeworkSection">
           <h3 class="sidebar-title">📋 Your Homework</h3>
-          <div id="homeworkList">
+          <div class="homework-list" id="homeworkList">
             <div class="homework-empty">Loading homework...</div>
           </div>
         </div>
 
         <!-- Notes Section (Bottom) -->
-        <div class="notes-section">
+        <div class="sidebar-section notes-section" id="notesSection">
           <h3 class="sidebar-title">💬 Notes to Therapist</h3>
-          <p style="font-size: 12px; color: var(--stone); margin-bottom: 12px;">
-            Share anything you'd like to discuss in your next session.
-          </p>
-          <textarea 
-            id="notesTextarea" 
-            class="notes-textarea" 
-            placeholder="What's been on your mind?"
-          ></textarea>
-          <button onclick="sendNotes()">Send to Therapist</button>
-          <div class="notes-saved" id="notesSaved">
-            ✓ Sent successfully!
-          </div>
-          
-          <div class="sent-messages">
-            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--stone);">Previously Sent</h4>
-            <div id="sentMessagesList"></div>
+          <div class="note-form">
+            <p style="font-size: 12px; color: var(--stone); margin-bottom: 12px;">
+              Share anything you'd like to discuss in your next session.
+            </p>
+            <textarea 
+              id="notesTextarea" 
+              class="notes-textarea" 
+              placeholder="What's been on your mind?"
+            ></textarea>
+            <button onclick="sendNotes()">Send to Therapist</button>
+            <div class="notes-saved" id="notesSaved">
+              ✓ Sent successfully!
+            </div>
+            
+            <div class="sent-messages">
+              <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--stone);">Previously Sent</h4>
+              <div id="sentMessagesList"></div>
+            </div>
           </div>
         </div>
 
@@ -697,6 +768,22 @@
     if (isMobile) {
       document.body.classList.add('mobile-view');
       console.log('📱 Mobile device detected - optimized layout loaded');
+      
+      // Make sidebar sections collapsible on mobile
+      document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('.sidebar-section');
+        sections.forEach(section => {
+          const header = section.querySelector('h3');
+          if (header) {
+            // Start collapsed on mobile
+            section.classList.add('collapsed');
+            
+            header.addEventListener('click', () => {
+              section.classList.toggle('collapsed');
+            });
+          }
+        });
+      });
     }
     
     // Configuration
