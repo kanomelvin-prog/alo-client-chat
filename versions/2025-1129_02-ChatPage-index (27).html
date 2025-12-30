@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alo - Your Thinking Partner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FDFBF7;
+      --warm-white: #FAF8F5;
+      --sage: #8B9A7D;
+      --sage-light: #E8EDE4;
+      --charcoal: #2D2A26;
+      --stone: #9C9589;
+      --border: rgba(156, 149, 137, 0.2);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Header Section */
+    .header {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: var(--sage);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    h1 {
+      color: var(--charcoal);
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .tagline {
+      color: var(--stone);
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+    
+    /* Client Connection Card */
+    .connection-card {
+      background: var(--sage-light);
+      border: 1px solid var(--sage);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .connection-card.connected {
+      background: #d1fae5;
+      border-color: var(--success);
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--stone);
+      border-radius: 50%;
+    }
+    
+    .status-dot.connected {
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .status-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    
+    .client-code-input {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .client-code-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .client-code-input button {
+      padding: 12px 24px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .client-code-input button:hover {
+      background: #7a8a6d;
+    }
+    
+    .connected-info {
+      display: none;
+      font-size: 14px;
+      color: var(--charcoal);
+    }
+    
+    .connected-info.show {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logoff-btn {
+      padding: 8px 16px;
+      background: white;
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .logoff-btn:hover {
+      background: var(--warm-white);
+      border-color: var(--stone);
+    }
+    
+    /* Session Info Card */
+    .session-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .session-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+    }
+    
+    .session-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .session-item {
+      padding: 16px;
+      background: var(--warm-white);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .session-label {
+      font-size: 12px;
+      color: var(--stone);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .session-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    
+    /* Homework Card */
+    .homework-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .homework-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .homework-count {
+      background: var(--sage);
+      color: white;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    
+    .homework-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .homework-item {
+      padding: 16px;
+      background: var(--warm-white);
+      border-radius: 8px;
+      border-left: 4px solid var(--sage);
+    }
+    
+    .homework-item.overdue {
+      border-left-color: var(--danger);
+      background: #fef2f2;
+    }
+    
+    .homework-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    
+    .homework-desc {
+      font-size: 13px;
+      color: var(--stone);
+      margin-bottom: 8px;
+    }
+    
+    .homework-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--stone);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--stone);
+      font-size: 14px;
+    }
+    
+    /* Chat Section */
+    .chat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    
+    .chat-ready {
+      color: var(--success);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    
+    .chat-instructions {
+      color: var(--stone);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .guest-chat-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--warm-white);
+      color: var(--charcoal);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    
+    .guest-chat-btn:hover {
+      background: var(--sage-light);
+      border-color: var(--sage);
+    }
+    
+    .guest-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--stone);
+      font-style: italic;
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      color: var(--stone);
+      font-size: 12px;
+    }
+    
+    .footer a {
+      color: var(--sage);
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Loading state */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--sage-light);
+      border-top: 2px solid var(--sage);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 640px) {
+      .session-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">A</div>
+      <h1>Alo</h1>
+      <p class="tagline">Your thinking partner between therapy sessions</p>
+    </div>
+    
+    <!-- Client Connection -->
+    <div class="connection-card" id="connectionCard">
+      <div class="connection-status">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="statusText">Not connected to therapist</div>
+      </div>
+      
+      <div class="client-code-input" id="codeInput">
+        <input 
+          type="text" 
+          id="clientCodeField" 
+          placeholder="Enter your client code (e.g., ClientName-001)"
+          autocomplete="off"
+        >
+        <button onclick="connectClient()">Connect</button>
+      </div>
+      
+      <div class="connected-info" id="connectedInfo">
+        <div>
+          <strong>Connected as:</strong> <span id="clientName"></span>
+        </div>
+        <button class="logoff-btn" onclick="logoff()">Disconnect</button>
+      </div>
+    </div>
+    
+    <!-- Session Info -->
+    <div class="session-card">
+      <h2>📅 Your Sessions</h2>
+      <div class="session-info">
+        <div class="session-item">
+          <div class="session-label">Last Session</div>
+          <div class="session-value" id="lastSession">Not scheduled</div>
+        </div>
+        <div class="session-item">
+          <div class="session-label">Next Session</div>
+          <div class="session-value" id="nextSession">Not scheduled</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Homework -->
+    <div class="homework-card">
+      <h2>
+        📋 Your Homework
+        <span class="homework-count" id="homeworkCount">0</span>
+      </h2>
+      <div class="homework-list" id="homeworkList">
+        <div class="empty-state">
+          <div class="loading"></div>
+          <p style="margin-top: 12px;">Loading homework...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chat Section -->
+    <div class="chat-card">
+      <div class="chat-ready" id="chatStatus">
+        <div class="loading" style="margin: 0 auto 12px;"></div>
+        Connecting to Alo...
+      </div>
+      <p class="chat-instructions">
+        Once connected, click the chat button in the corner to start talking with Alo.
+        Available 24/7 to help you process emotions and think through decisions.
+      </p>
+      
+      <div id="guestChatSection" style="display: none;">
+        <button class="guest-chat-btn" onclick="startGuestChat()">
+          💬 Chat as Guest
+        </button>
+        <p class="guest-note">
+          Chat without connecting to a therapist. Your conversation won't be saved to a dashboard.
+        </p>
+      </div>
+    </div>
+    
+    <div class="footer">
+      Built with care by <a href="https://withalo.me" target="_blank">Alo</a> • 
+      <a href="#" onclick="alert('Privacy policy coming soon'); return false;">Privacy</a> • 
+      <a href="#" onclick="alert('Terms of service coming soon'); return false;">Terms</a>
+    </div>
+  </div>
+  
+  <!-- Botpress Webchat -->
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+  
+  <script>
+    // Configuration
+    const SUPABASE_URL = 'https://wekvrjnbjpbvvpfuwzvz.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indla3Zyam5ianBidnZwZnV3enZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzOTM4NzIsImV4cCI6MjA0OTk2OTg3Mn0.HTG4XJ-LoOJsn0rNF2APLpLEqYoPZ3NVLJ9c8HfOYMY';
+    const BOT_ID = 'fc0fad71-daea-4d22-adf5-3a659042d46a';
+    const CLIENT_ID = 'fc13c6c1-ac2b-4114-bf9b-1e73e2a89b3e';
+    
+    let currentClientCode = localStorage.getItem('alo_client_code') || '';
+    
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (currentClientCode) {
+        setConnected(currentClientCode);
+        loadHomework(currentClientCode);
+      } else {
+        document.getElementById('homeworkList').innerHTML = '<div class="empty-state">Connect your client code to see homework</div>';
+        // Show guest chat button if not connected
+        document.getElementById('guestChatSection').style.display = 'block';
+      }
+      
+      initBotpress();
+    });
+    
+    // Supabase query helper
+    async function supabaseQuery(endpoint) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}${endpoint}`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        
+        if (!response.ok) return null;
+        const text = await response.text();
+        return text ? JSON.parse(text) : null;
+      } catch (error) {
+        console.error('Supabase error:', error);
+        return null;
+      }
+    }
+    
+    // Connect client
+    function connectClient() {
+      const code = document.getElementById('clientCodeField').value.trim();
+      if (!code) {
+        alert('Please enter a client code');
+        return;
+      }
+      
+      localStorage.setItem('alo_client_code', code);
+      currentClientCode = code;
+      setConnected(code);
+      loadHomework(code);
+    }
+    
+    function setConnected(code) {
+      document.getElementById('connectionCard').classList.add('connected');
+      document.getElementById('statusDot').classList.add('connected');
+      document.getElementById('statusText').textContent = 'Connected to therapist';
+      document.getElementById('codeInput').style.display = 'none';
+      document.getElementById('connectedInfo').classList.add('show');
+      document.getElementById('clientName').textContent = code;
+      document.getElementById('clientCodeField').value = code;
+      
+      // Hide guest chat button when connected
+      document.getElementById('guestChatSection').style.display = 'none';
+    }
+    
+    // Logoff function
+    function logoff() {
+      if (!confirm('Are you sure you want to disconnect? Your homework and session info will be hidden.')) {
+        return;
+      }
+      
+      localStorage.removeItem('alo_client_code');
+      currentClientCode = '';
+      
+      // Reset UI
+      document.getElementById('connectionCard').classList.remove('connected');
+      document.getElementById('statusDot').classList.remove('connected');
+      document.getElementById('statusText').textContent = 'Not connected to therapist';
+      document.getElementById('codeInput').style.display = 'flex';
+      document.getElementById('connectedInfo').classList.remove('show');
+      document.getElementById('clientCodeField').value = '';
+      
+      // Clear homework
+      document.getElementById('homeworkList').innerHTML = '<div class="empty-state">Connect your client code to see homework</div>';
+      document.getElementById('homeworkCount').textContent = '0';
+      
+      // Show guest chat button
+      document.getElementById('guestChatSection').style.display = 'block';
+    }
+    
+    // Guest chat function
+    function startGuestChat() {
+      if (window.botpress) {
+        // Clear Botpress conversation storage to start fresh
+        // This removes the stored conversation ID and history
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('bp-') || key.includes('botpress') || key.includes('webchat')) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        // Small delay to ensure storage is cleared
+        setTimeout(() => {
+          // Reinitialize Botpress to start fresh
+          initBotpress();
+          
+          // Open the chat after reinit
+          setTimeout(() => {
+            if (window.botpress && window.botpress.open) {
+              window.botpress.open();
+            }
+          }, 500);
+        }, 100);
+      } else {
+        alert('Chat is loading... please try again in a moment.');
+      }
+    }
+    
+    // Load homework
+    async function loadHomework(clientCode) {
+      const homework = await supabaseQuery(`/rest/v1/homework?client_code=eq.${clientCode}&active=eq.true&select=*&order=created_at.desc`);
+      
+      const homeworkList = document.getElementById('homeworkList');
+      const homeworkCount = document.getElementById('homeworkCount');
+      
+      if (!homework || homework.length === 0) {
+        homeworkList.innerHTML = '<div class="empty-state">No active homework assigned</div>';
+        homeworkCount.textContent = '0';
+        return;
+      }
+      
+      homeworkCount.textContent = homework.length;
+      
+      homeworkList.innerHTML = homework.map(hw => {
+        const dueDate = hw.due_date ? new Date(hw.due_date) : null;
+        const isOverdue = dueDate && dueDate < new Date();
+        
+        return `
+          <div class="homework-item ${isOverdue ? 'overdue' : ''}">
+            <div class="homework-title">${hw.homework_type || 'Homework'}</div>
+            <div class="homework-desc">${hw.description || ''}</div>
+            <div class="homework-meta">
+              <span>📅 Assigned: ${new Date(hw.created_at).toLocaleDateString()}</span>
+              ${dueDate ? `<span>${isOverdue ? '⚠️ Overdue' : '🕐 Due: ' + dueDate.toLocaleDateString()}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Initialize Botpress
+    function initBotpress() {
+      const chatStatus = document.getElementById('chatStatus');
+      
+      if (typeof window.botpress === 'undefined') {
+        console.error('Botpress not loaded');
+        chatStatus.innerHTML = '❌ Chat unavailable (network blocked)';
+        return;
+      }
+      
+      window.botpress.init({
+        botId: BOT_ID,
+        clientId: CLIENT_ID,
+        configuration: {
+          color: '#8B9A7D',
+          variant: 'soft',
+          themeMode: 'light',
+          fontFamily: 'Inter',
+          botName: 'Alo',
+          botDescription: 'Your thinking partner',
+          composerPlaceholder: 'What\'s on your mind?',
+          showPoweredBy: false
+        }
+      });
+      
+      window.botpress.on('webchat:ready', () => {
+        console.log('✅ Webchat ready');
+        chatStatus.innerHTML = '✅ Alo is ready to talk!';
+      });
+    }
+    
+    // Wait for Botpress to load
+    let attempts = 0;
+    const maxAttempts = 30;
+    
+    const checkInterval = setInterval(() => {
+      attempts++;
+      
+      if (window.botpress) {
+        clearInterval(checkInterval);
+        initBotpress();
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkInterval);
+        document.getElementById('chatStatus').innerHTML = '❌ Chat connection timeout';
+      }
+    }, 100);
+  </script>
+</body>
+</html>
